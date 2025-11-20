@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Eliminar Avaliação{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 50px auto; padding: 30px; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+  <h2 style="color: #dc3545; margin-bottom: 20px;">Eliminar Avaliação</h2>
+  
+  <div style="padding: 20px; background: #f8f9fa; border-left: 4px solid #dc3545; margin-bottom: 30px;">
+    <p style="margin: 0 0 10px 0;"><strong>Livro:</strong> {{ review.livro.titulo }}</p>
+    <p style="margin: 0 0 10px 0;"><strong>Avaliação:</strong> {{ review.rating }}★</p>
+    <p style="margin: 0 0 10px 0;"><strong>Título:</strong> {{ review.titulo }}</p>
+    <p style="margin: 0;"><strong>Data:</strong> {{ review.data_criacao|date:"d/m/Y H:i" }}</p>
+  </div>
+  
+  <p style="margin-bottom: 30px; color: #666;">
+    Tem a certeza que deseja eliminar esta avaliação? Esta ação não pode ser desfeita.
+  </p>
+  
+  <form method="post" style="display: inline;">
+    {% csrf_token %}
+    <button type="submit" style="background: #dc3545; color: white; padding: 12px 30px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">
+      Sim, Eliminar
+    </button>
+  </form>
+  
+  <a href="{% url 'livro_detalhe' review.livro.id %}" 
+     style="background: #6c757d; color: white; padding: 12px 30px; border: none; border-radius: 5px; font-size: 16px; text-decoration: none; margin-left: 10px; display: inline-block;">
+    Cancelar
+  </a>
+</div>
+{% endblock %}

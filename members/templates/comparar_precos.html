@@ -1,0 +1,231 @@
+{% extends 'base.html' %}
+
+{% block title %}Comparar Preços - {{ livro.titulo }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .comparar-container {
+        background: #f5f7f9;
+        min-height: 100vh;
+        padding: 30px 0;
+    }
+    
+    .comparar-content {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+    
+    .comparar-header {
+        background: white;
+        padding: 25px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+    
+    .livro-mini-img {
+        width: 80px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 4px;
+    }
+    
+    .comparar-titulo {
+        font-size: 20px;
+        font-weight: 600;
+        color: #333;
+        margin: 0 0 5px 0;
+    }
+    
+    .comparar-subtitulo {
+        font-size: 14px;
+        color: #666;
+    }
+    
+    .precos-grid {
+        display: grid;
+        gap: 15px;
+    }
+    
+    .preco-card {
+        background: white;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 20px;
+        display: grid;
+        grid-template-columns: 1fr auto auto;
+        align-items: center;
+        gap: 20px;
+        transition: all 0.3s;
+    }
+    
+    .preco-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        transform: translateY(-2px);
+    }
+    
+    .preco-card.melhor-preco {
+        border-color: #28a745;
+        background: linear-gradient(to right, #f0fff4, white);
+        position: relative;
+    }
+    
+    .badge-melhor {
+        position: absolute;
+        top: -10px;
+        left: 20px;
+        background: #28a745;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+    }
+    
+    .loja-info-comparar {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .loja-icon {
+        width: 40px;
+        height: 40px;
+        background: #f0f0f0;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+    }
+    
+    .loja-nome {
+        font-size: 16px;
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .preco-valor-comparar {
+        font-size: 32px;
+        font-weight: 600;
+        color: #B12704;
+    }
+    
+    .preco-card.melhor-preco .preco-valor-comparar {
+        color: #28a745;
+    }
+    
+    .btn-ver-loja {
+        background: linear-gradient(to bottom, #f7dfa5, #f0c14b);
+        border: 1px solid #a88734;
+        border-radius: 6px;
+        padding: 10px 24px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #111;
+        text-decoration: none;
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+    
+    .btn-ver-loja:hover {
+        background: linear-gradient(to bottom, #f5d78e, #edb933);
+        transform: translateY(-1px);
+    }
+    
+    .preco-card.melhor-preco .btn-ver-loja {
+        background: #28a745;
+        border-color: #28a745;
+        color: white;
+    }
+    
+    .preco-card.melhor-preco .btn-ver-loja:hover {
+        background: #218838;
+        border-color: #218838;
+    }
+    
+    .sem-precos {
+        background: white;
+        padding: 60px 20px;
+        border-radius: 8px;
+        text-align: center;
+        color: #999;
+    }
+    
+    .btn-voltar-comparar {
+        display: inline-block;
+        background: white;
+        border: 1px solid #d5d9d9;
+        color: #333;
+        padding: 10px 20px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 14px;
+        margin-top: 20px;
+        transition: all 0.2s;
+    }
+    
+    .btn-voltar-comparar:hover {
+        background: #f7f8f8;
+        border-color: #999;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="comparar-container">
+    <div class="comparar-content">
+        <!-- Header com info do livro -->
+        <div class="comparar-header">
+            {% if livro.imagem_capa %}
+                <img src="{{ livro.imagem_capa }}" alt="{{ livro.titulo }}" class="livro-mini-img">
+            {% else %}
+                <div class="livro-mini-img" style="background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 30px;">📚</div>
+            {% endif %}
+            <div style="flex: 1;">
+                <h1 class="comparar-titulo">{{ livro.titulo }}</h1>
+                <p class="comparar-subtitulo">Comparação de preços em diferentes lojas</p>
+            </div>
+            <a href="{% url 'livro_detalhe' livro.id %}" class="btn-voltar-comparar">
+                ← Voltar
+            </a>
+        </div>
+        
+        <!-- Grid de Preços -->
+        {% if precos %}
+            <div class="precos-grid">
+                {% for preco in precos %}
+                    <div class="preco-card {% if preco_mais_baixo and preco.id == preco_mais_baixo.id %}melhor-preco{% endif %}">
+                        {% if preco_mais_baixo and preco.id == preco_mais_baixo.id %}
+                            <div class="badge-melhor">✓ Melhor Preço</div>
+                        {% endif %}
+                        
+                        <div class="loja-info-comparar">
+                            <div class="loja-icon">🏪</div>
+                            <span class="loja-nome">{{ preco.loja.nome }}</span>
+                        </div>
+                        
+                        <div class="preco-valor-comparar">
+                            {{ preco.preco|floatformat:2 }}€
+                        </div>
+                        
+                        <a href="{{ preco.url_produto }}" target="_blank" class="btn-ver-loja">
+                            Ver na loja →
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="sem-precos">
+                <p style="font-size: 18px; margin-bottom: 10px;">😕 Sem preços disponíveis</p>
+                <p>Não encontrámos preços para este livro em outras lojas.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

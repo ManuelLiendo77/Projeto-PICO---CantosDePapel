@@ -1,0 +1,28 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /painel-admin/
+Disallow: /accounts/
+Disallow: /carrinho/
+Disallow: /checkout/
+Disallow: /perfil/
+Disallow: /pedidos/
+
+# Sitemap
+Sitemap: {{ request.scheme }}://{{ request.get_host }}/sitemap.xml
+
+# Crawl-delay
+Crawl-delay: 10
+
+# Allow access to static files
+Allow: /static/
+
+# Popular search engines
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /

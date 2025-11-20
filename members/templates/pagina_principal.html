@@ -1,0 +1,392 @@
+﻿{% extends 'base.html' %}
+
+{% block title %}Cantos de Papel - Início{% endblock %}
+
+{% block content %}
+<div class="home-page">
+<div class="main-container">
+  <div class="hero">
+    <div class="hero-carousel">
+      <!-- Slide 1 -->
+      <div class="hero-slide active" style="background: linear-gradient(135deg, rgba(44, 62, 80, 0.9), rgba(52, 73, 94, 0.9)), url('https://picsum.photos/1920/600?random=1'); background-size: cover; background-position: center;">
+        <div class="hero-content">
+          <h1>📚 Descubra Novos Mundos</h1>
+          <p>Cada livro é uma porta para outra vida. Receba os seus favoritos em 48h para todo o país.</p>
+          <div class="hero-cta-wrapper">
+            <a href="/livros/" class="hero-btn">Explorar catálogo completo</a>
+            <a href="/?filtro=novidades" class="hero-btn outline">Ver novidades</a>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Slide 2 -->
+      <div class="hero-slide" style="background: linear-gradient(135deg, rgba(52, 152, 219, 0.85), rgba(41, 128, 185, 0.85)), url('https://picsum.photos/1920/600?random=2'); background-size: cover; background-position: center;">
+        <div class="hero-content">
+          <h1>✨ A Magia da Leitura</h1>
+          <p>Guarde os seus favoritos e receba recomendações feitas à medida.</p>
+          <div class="hero-cta-wrapper">
+            <a href="{% url 'lista_favoritos' %}" class="hero-btn">Ver favoritos</a>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Slide 3 -->
+      <div class="hero-slide" style="background: linear-gradient(135deg, rgba(155, 89, 182, 0.85), rgba(142, 68, 173, 0.85)), url('https://picsum.photos/1920/600?random=3'); background-size: cover; background-position: center;">
+        <div class="hero-content">
+          <h1>📖 O Seu Próximo Favorito</h1>
+          <p>Milhares de títulos cuidadosamente curados para leitores exigentes.</p>
+          <div class="hero-cta-wrapper">
+            <a href="/?filtro=mais-vendidos" class="hero-btn">Ver mais vendidos</a>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Slide 4 -->
+      <div class="hero-slide" style="background: linear-gradient(135deg, rgba(231, 76, 60, 0.85), rgba(192, 57, 43, 0.85)), url('https://picsum.photos/1920/600?random=4'); background-size: cover; background-position: center;">
+        <div class="hero-content">
+          <h1>🎁 Ofertas Especiais</h1>
+          <p>Aceda a descontos exclusivos todas as semanas e acumule vantagens.</p>
+          <div class="hero-cta-wrapper">
+            <a href="/?filtro=ofertas" class="hero-btn">Aproveitar ofertas</a>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Slide 5 -->
+      <div class="hero-slide" style="background: linear-gradient(135deg, rgba(39, 174, 96, 0.85), rgba(46, 204, 113, 0.85)), url('https://picsum.photos/1920/600?random=5'); background-size: cover; background-position: center;">
+        <div class="hero-content">
+          <h1>💡 Conhecimento Sem Limites</h1>
+          <p>Guias técnicos, biografias, clássicos intemporais. Tudo num só lugar.</p>
+          <div class="hero-cta-wrapper">
+            <a href="/livros/?categoria=T%C3%A9cnicos" class="hero-btn">Explorar não ficção</a>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Flechas de navegación -->
+      <button class="carousel-arrow carousel-arrow-left" onclick="changeSlide(-1)">‹</button>
+      <button class="carousel-arrow carousel-arrow-right" onclick="changeSlide(1)">›</button>
+      
+      <!-- Indicadores -->
+      <div class="carousel-indicators">
+        <button class="carousel-indicator active" onclick="goToSlide(0)"></button>
+        <button class="carousel-indicator" onclick="goToSlide(1)"></button>
+        <button class="carousel-indicator" onclick="goToSlide(2)"></button>
+        <button class="carousel-indicator" onclick="goToSlide(3)"></button>
+        <button class="carousel-indicator" onclick="goToSlide(4)"></button>
+      </div>
+    </div>
+  </div>
+
+  <section class="benefits-grid">
+    <div class="benefit-card">
+      <h3>🚚 Entrega 48h</h3>
+      <p>Envio rápido para todo o território continental com tracking em tempo real e embalagens sustentáveis.</p>
+      <a href="/carrinho/">Saiba mais sobre envios →</a>
+    </div>
+    <div class="benefit-card">
+      <h3>🎯 Curadoria cuidadosa</h3>
+      <p>Listas temáticas semanais e sugestões portuguesas selecionadas pela nossa equipa editorial.</p>
+      <a href="/?filtro=novidades">Ver listas inspiradoras →</a>
+    </div>
+    <div class="benefit-card">
+      <h3>🤝 Apoio dedicado</h3>
+      <p>Esclarecemos dúvidas sobre encomendas, devoluções e sugestões em menos de 24h.</p>
+      <a href="/privacidade/">Contactar a equipa →</a>
+    </div>
+  </section>
+
+  {% if filtro == 'ofertas' %}
+      <h2 class="section-title">🎁 Livros em Oferta</h2>
+  {% elif filtro == 'mais-vendidos' %}
+      <h2 class="section-title">🔥 Mais Vendidos da Semana</h2>
+  {% elif filtro == 'novidades' %}
+      <h2 class="section-title">✨ Novidades 2025</h2>
+  {% else %}
+      <h2 class="section-title">📚 Livros em Destaque</h2>
+  {% endif %}
+
+  <div class="livros-grid">
+      {% for info in livros_info %}
+          <div class="livro-card">
+        <div class="livro-card__media">
+          <a href="{% url 'livro_detalhe' info.livro.id %}" class="livro-card__media-link" aria-label="Ver detalhes de {{ info.livro.titulo }}">
+            <div class="livro-imagem-wrapper">
+              {% if info.livro.imagem_capa %}
+                <img src="{{ info.livro.imagem_capa }}" alt="{{ info.livro.titulo }}" class="livro-imagem">
+              {% else %}
+                <div class="livro-placeholder">📚</div>
+              {% endif %}
+            </div>
+          </a>
+
+          <div class="livro-badges">
+            {% if info.livro.novidade %}
+              <span class="livro-badge badge-novo">NOVO</span>
+            {% endif %}
+            {% if info.livro.em_oferta %}
+              <span class="livro-badge badge-oferta">-{{ info.livro.desconto_percentagem|floatformat:0 }}%</span>
+            {% endif %}
+            {% if info.livro.mais_vendido %}
+              <span class="livro-badge badge-vendido">TOP</span>
+            {% endif %}
+          </div>
+
+          <button class="btn-favorito livro-card__favorite {% if user.is_authenticated and info.livro.id in favoritos_ids %}ativo{% endif %}"
+              data-livro-id="{{ info.livro.id }}"
+              data-login-url="/accounts/login/?next={{ request.path|urlencode }}"
+              onclick="handleFavoritoClick(event, this)"
+              title="{% if user.is_authenticated and info.livro.id in favoritos_ids %}Remover de favoritos{% else %}Adicionar a favoritos{% endif %}"
+              aria-pressed="{% if user.is_authenticated and info.livro.id in favoritos_ids %}true{% else %}false{% endif %}">
+            {% if user.is_authenticated and info.livro.id in favoritos_ids %}❤️{% else %}🤍{% endif %}
+          </button>
+        </div>
+
+        <div class="livro-card__body">
+          <div class="livro-card__eyebrow">
+            <span class="livro-card__categoria">{{ info.livro.categoria|default:"Coleção exclusiva" }}</span>
+            <div class="livro-card__rating" aria-label="Avaliação média {{ info.estrelas }} de 5">
+              <span class="livro-card__rating-star">★</span>
+              <strong>{{ info.estrelas }}.0</strong>
+              <span class="livro-card__rating-count">({{ info.total_reviews|default:28 }} opiniões)</span>
+            </div>
+          </div>
+
+          <a href="{% url 'livro_detalhe' info.livro.id %}" class="livro-card__title-link">
+            <h3 class="livro-titulo">{{ info.livro.titulo }}</h3>
+          </a>
+          <p class="livro-autor">{{ info.livro.autor }}</p>
+          <p class="livro-card__description">{{ info.livro.descricao|default:"Sem descrição disponível"|truncatewords:24 }}</p>
+
+          <ul class="livro-card__meta">
+            <li>
+              <span>Formato</span>
+              <strong>{{ info.tipo_capa }}</strong>
+            </li>
+            <li>
+              <span>Disponibilidade</span>
+              <strong>{% if info.em_stock %}Envio imediato{% elif info.stock_baixo %}Poucas unidades{% else %}Em reposição{% endif %}</strong>
+            </li>
+            <li>
+              <span>Melhor preço</span>
+              <strong>{% if info.loja_min %}{{ info.loja_min }}{% else %}Ver retalhistas{% endif %}</strong>
+            </li>
+          </ul>
+
+          <div class="livro-card__price-row">
+            <div class="livro-card__price">
+              {% if info.preco_min %}
+                {% if info.preco_antigo and info.livro.em_oferta %}
+                  <span class="livro-preco-antigo">€{{ info.preco_antigo }}</span>
+                {% endif %}
+                <span class="livro-preco-atual">€{{ info.preco_min }}</span>
+              {% else %}
+                <span class="livro-preco-consultar">Consultar preço</span>
+              {% endif %}
+            </div>
+            <div class="livro-card__stock-tag {% if info.em_stock %}em-stock{% else %}sem-stock{% endif %}">
+              {% if info.em_stock %}
+                ✓ Em stock
+              {% else %}
+                ✗ Esgotado
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="livro-card__actions">
+            <button class="btn-adicionar-carrinho"
+                aria-label="Adicionar {{ info.livro.titulo }} ao carrinho"
+                data-livro-id="{{ info.livro.id }}"
+                data-livro-titulo="{{ info.livro.titulo|escape }}"
+                data-livro-preco="{{ info.preco_min|default:'0' }}"
+                data-livro-imagem="{{ info.livro.imagem_capa|default_if_none:''|escape }}"
+                onclick="handleAddToCart(event, this)">
+              <span>🛒</span><span>Adicionar ao carrinho</span>
+            </button>
+
+            <a href="{% url 'livro_detalhe' info.livro.id %}" class="livro-card__secondary-link">
+              Ver detalhes
+            </a>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+          <div class="no-results">
+              <p style="text-align: center; padding: 60px 20px; color: #95a5a6; font-size: 18px;">
+                  {% if filtro == 'ofertas' %}
+                      🎁 Nenhuma oferta disponível no momento
+                  {% elif filtro == 'mais-vendidos' %}
+                      🔥 Nenhum livro mais vendido disponível
+                  {% elif filtro == 'novidades' %}
+                      ✨ Nenhuma novidade disponível
+                  {% else %}
+                      📚 Nenhum livro encontrado
+                  {% endif %}
+              </p>
+          </div>
+      {% endfor %}
+  </div>
+  </div>
+</div>
+
+<script>
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+
+function isUserAuthenticated() {
+  return document.body.dataset.userAuth === 'true';
+}
+
+function resolveLoginUrl(element) {
+  if (element && element.dataset.loginUrl) {
+    return element.dataset.loginUrl;
+  }
+  return document.body.dataset.loginUrl || '/accounts/login/';
+}
+
+function handleFavoritoClick(event, buttonElement) {
+  event.preventDefault();
+  event.stopPropagation();
+
+  if (!isUserAuthenticated()) {
+    window.location.href = resolveLoginUrl(buttonElement);
+    return;
+  }
+
+  const livroId = buttonElement.dataset.livroId;
+
+  fetch(`/favoritos/toggle/${livroId}/`, {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': getCookie('csrftoken'),
+      'Content-Type': 'application/json'
+    }
+  })
+    .then(response => response.json())
+    .then(data => {
+      const ativo = Boolean(data.adicionado);
+      buttonElement.classList.toggle('ativo', ativo);
+      buttonElement.innerHTML = ativo ? '❤️' : '🤍';
+      buttonElement.title = ativo ? 'Remover de favoritos' : 'Adicionar a favoritos';
+      buttonElement.setAttribute('aria-pressed', ativo ? 'true' : 'false');
+    })
+    .catch(error => {
+      console.error('Erro ao adicionar favorito:', error);
+      alert('Erro ao adicionar aos favoritos. Por favor, tente novamente.');
+    });
+}
+
+function handleAddToCart(event, buttonElement) {
+  event.preventDefault();
+  event.stopPropagation();
+
+  const livroId = parseInt(buttonElement.dataset.livroId || '0', 10);
+  const titulo = buttonElement.dataset.livroTitulo || '';
+  const preco = buttonElement.dataset.livroPreco || 0;
+  const imagem = buttonElement.dataset.livroImagem || '';
+
+  adicionarAoCarrinho(livroId, titulo, preco, imagem, 1);
+
+  const originalHTML = buttonElement.innerHTML;
+  buttonElement.classList.add('adicionado');
+  buttonElement.innerHTML = '<span>✓</span><span>Guardado!</span>';
+
+  setTimeout(() => {
+    buttonElement.classList.remove('adicionado');
+    buttonElement.innerHTML = originalHTML;
+  }, 2000);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const slides = document.querySelectorAll('.hero-slide');
+  const indicators = document.querySelectorAll('.carousel-indicator');
+  const heroCarousel = document.querySelector('.hero-carousel');
+
+  if (!slides.length || !heroCarousel) {
+    return;
+  }
+
+  let currentSlide = 0;
+  const totalSlides = slides.length;
+  let autoSlideInterval;
+
+  const showSlide = (index) => {
+    if (index >= totalSlides) {
+      currentSlide = 0;
+    } else if (index < 0) {
+      currentSlide = totalSlides - 1;
+    } else {
+      currentSlide = index;
+    }
+
+    slides.forEach(slide => slide.classList.remove('active'));
+    indicators.forEach(indicator => indicator.classList.remove('active'));
+
+    slides[currentSlide].classList.add('active');
+    indicators[currentSlide].classList.add('active');
+  };
+
+  const nextSlide = () => showSlide(currentSlide + 1);
+
+  window.changeSlide = (direction) => {
+    showSlide(currentSlide + direction);
+    resetAutoSlide();
+  };
+
+  window.goToSlide = (index) => {
+    showSlide(index);
+    resetAutoSlide();
+  };
+
+  const resetAutoSlide = () => {
+    clearInterval(autoSlideInterval);
+    autoSlideInterval = setInterval(nextSlide, 5000);
+  };
+
+  autoSlideInterval = setInterval(nextSlide, 5000);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') {
+      window.changeSlide(-1);
+    } else if (e.key === 'ArrowRight') {
+      window.changeSlide(1);
+    }
+  });
+
+  let touchStartX = 0;
+  let touchEndX = 0;
+
+  heroCarousel.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+  }, false);
+
+  heroCarousel.addEventListener('touchend', (e) => {
+    touchEndX = e.changedTouches[0].screenX;
+    handleSwipe();
+  }, false);
+
+  const handleSwipe = () => {
+    if (touchEndX < touchStartX - 50) {
+      window.changeSlide(1);
+    }
+    if (touchEndX > touchStartX + 50) {
+      window.changeSlide(-1);
+    }
+  };
+});
+
+</script>
+
+{% endblock %}

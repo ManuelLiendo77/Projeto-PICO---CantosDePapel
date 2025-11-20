@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="carrinho-container">
+    <h1 class="carrinho-titulo">Carrinho de compras</h1>
+    <p style="color:#5d6d7e;margin-bottom:30px;">Revise os seus artigos favoritos antes de finalizar a encomenda. Entregamos em 48h para Portugal continental.</p>
+    
+    <div id="carrinho-content">
+    <!-- O conteúdo é carregado dinamicamente por JavaScript -->
+    </div>
+</div>
+
+<script>
+function carregarCarrinho() {
+    const carrinho = JSON.parse(localStorage.getItem('carrinho') || '[]');
+    const container = document.getElementById('carrinho-content');
+    
+    if (carrinho.length === 0) {
+        container.innerHTML = `
+            <div class="carrinho-produtos">
+                <div class="carrinho-vazio">
+                    <h2>🛒 O seu carrinho está vazio</h2>
+                    <p>Adicione livros ao carrinho para começar as suas compras.</p>
+                    <a href="/" class="btn-continuar">Descobrir livros</a>
+                </div>
+            </div>
+        `;
+        return;
+    }
+    
+    let subtotal = 0;
+    
+    let produtosHtml = `
+        <div class="carrinho-produtos">
+            <div class="produto-header">
+                <div>Produto</div>
+                <div>Preço</div>
+                <div>Quantidade</div>
+                <div style="text-align: right;">Subtotal</div>
+            </div>
+    `;
+    
+    carrinho.forEach((item, index) => {
+        const itemSubtotal = item.preco * item.quantidade;
+        subtotal += itemSubtotal;
+        
+        produtosHtml += `
+            <div class="produto-item">
+                <div class="produto-info">
+                    <button class="btn-remover" onclick="removerItem(${index})" title="Remover">×</button>
+                    <div class="produto-img">
+                        <span style="font-size: 2em;">📚</span>
+                    </div>
+                    <div class="produto-detalhes">
+                        <h3>${item.titulo}</h3>
+                        <p>Ref.: ${item.id}</p>
+                    </div>
+                </div>
+                <div class="produto-preco">${item.preco.toFixed(2)}€</div>
+                <div class="produto-quantidade">
+                    <button class="qty-btn" onclick="alterarQuantidade(${index}, -1)">−</button>
+                    <input type="number" class="qty-input" value="${item.quantidade}" min="1" readonly>
+                    <button class="qty-btn" onclick="alterarQuantidade(${index}, 1)">+</button>
+                </div>
+                <div class="produto-subtotal">${itemSubtotal.toFixed(2)}€</div>
+            </div>
+        `;
+    });
+    
+    produtosHtml += `</div>`;
+    
+    // Os preços já incluem IVA de 23%
+    // subtotal = valor com IVA; valor sem IVA = subtotal / 1.23
+    // IVA = subtotal - valor sem IVA
+    
+    const total = subtotal;
+    const precioSinIVA = total / 1.23;
+    const iva = total - precioSinIVA;
+    
+    const resumoHtml = `
+        <div class="carrinho-resumo">
+            <h2 class="resumo-titulo">Total no carrinho</h2>
+            
+            <div class="resumo-linha">
+                <span>Quantidade de artigos:</span>
+                <strong>${carrinho.length}</strong>
+            </div>
+            
+            <div class="resumo-linha">
+                <span>Subtotal (sem IVA):</span>
+                <strong>${precioSinIVA.toFixed(2)}€</strong>
+            </div>
+            
+            <div class="resumo-linha">
+                <span>IVA (23%)</span>
+                <strong>${iva.toFixed(2)}€</strong>
+            </div>
+            
+            <div class="codigo-promocional">
+                <h4>Tem um código promocional?</h4>
+                <div class="codigo-input-group">
+                    <input type="text" placeholder="Código do cupão" id="codigo-cupao">
+                    <button class="btn-aplicar" onclick="aplicarCodigo()">Aplicar</button>
+                </div>
+            </div>
+            
+            <div class="resumo-total">
+                <span>Total:</span>
+                <span class="valor">${total.toFixed(2)}€</span>
+            </div>
+            <div class="resumo-iva">(com IVA incluído)</div>
+            
+            <button class="btn-finalizar" onclick="finalizarCompra()">Seguir para checkout →</button>
+            <button class="btn-ver-carrinho" onclick="window.location.href='/'">Continuar a descobrir</button>
+        </div>
+    `;
+    
+    container.innerHTML = `
+        <div class="carrinho-content">
+            ${produtosHtml}
+            ${resumoHtml}
+        </div>
+    `;
+}
+
+function alterarQuantidade(index, delta) {
+    const carrinho = JSON.parse(localStorage.getItem('carrinho') || '[]');
+    if (carrinho[index]) {
+        carrinho[index].quantidade += delta;
+        if (carrinho[index].quantidade < 1) {
+            carrinho[index].quantidade = 1;
+        }
+        localStorage.setItem('carrinho', JSON.stringify(carrinho));
+        carregarCarrinho();
+        atualizarContadorCarrinho();
+    }
+}
+
+function removerItem(index) {
+    const carrinho = JSON.parse(localStorage.getItem('carrinho') || '[]');
+    carrinho.splice(index, 1);
+    localStorage.setItem('carrinho', JSON.stringify(carrinho));
+    carregarCarrinho();
+    atualizarContadorCarrinho();
+}
+
+function aplicarCodigo() {
+    const codigo = document.getElementById('codigo-cupao').value.trim();
+    if (codigo) {
+        alert('Estamos a validar o código "' + codigo + '". Em breve poderá aplicá-lo diretamente no checkout.');
+    } else {
+        alert('Por favor, introduza um código válido.');
+    }
+}
+
+function finalizarCompra() {
+    const carrinho = JSON.parse(localStorage.getItem('carrinho') || '[]');
+    if (carrinho.length === 0) {
+        alert('O carrinho está vazio');
+        return;
+    }
+    
+    // Redirecionar para a página de checkout
+    window.location.href = '/checkout/';
+}
+
+// Cargar carrinho al iniciar
+document.addEventListener('DOMContentLoaded', carregarCarrinho);
+</script>
+{% endblock %}

@@ -1,0 +1,881 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ livro.titulo }} - Cantos de Papel{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Container Principal */
+    .livro-detalhe-container {
+        background: #f5f7f9;
+        min-height: 100vh;
+        padding: 20px 0;
+    }
+    
+    .detalhe-content {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+    
+    /* Breadcrumb Compacto */
+    .breadcrumb {
+        background: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: 13px;
+        color: #666;
+    }
+    
+    .breadcrumb a {
+        color: #007bff;
+        text-decoration: none;
+    }
+    
+    .breadcrumb a:hover {
+        text-decoration: underline;
+    }
+    
+    .breadcrumb-separator {
+        margin: 0 8px;
+        color: #999;
+    }
+    
+    /* Grid Principal - Layout Amazon */
+    .detalhe-grid {
+        display: grid;
+        grid-template-columns: 380px 1fr 350px;
+        gap: 25px;
+        margin-bottom: 20px;
+    }
+    
+    /* Coluna Imagem */
+    .imagem-col {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 480px;
+    }
+    
+    .imagem-col img {
+        width: 100%;
+        max-height: 550px;
+        object-fit: contain;
+        border-radius: 4px;
+    }
+    
+    .livro-sem-imagem {
+        width: 100%;
+        height: 480px;
+        background: #f0f0f0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        color: #999;
+    }
+    
+    .livro-sem-imagem span {
+        font-size: 90px;
+        margin-bottom: 10px;
+    }
+    
+    /* Coluna Info Principal */
+    .info-col {
+        background: white;
+        padding: 25px;
+        border-radius: 8px;
+    }
+    
+    .titulo-livro {
+        font-size: 24px;
+        font-weight: 600;
+        color: #333;
+        margin: 0 0 8px 0;
+        line-height: 1.3;
+    }
+    
+    .autor-livro {
+        font-size: 15px;
+        color: #007bff;
+        margin-bottom: 15px;
+    }
+    
+    .autor-livro a {
+        color: #007bff;
+        text-decoration: none;
+    }
+    
+    .autor-livro a:hover {
+        text-decoration: underline;
+        color: #0056b3;
+    }
+    
+    /* Rating Compacto */
+    .rating-compacto {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .estrelas-display {
+        color: #FFD700;
+        font-size: 18px;
+        letter-spacing: 2px;
+    }
+    
+    .rating-texto {
+        font-size: 14px;
+        color: #007bff;
+        cursor: pointer;
+    }
+    
+    .rating-texto:hover {
+        text-decoration: underline;
+    }
+    
+    /* Badges */
+    .badges-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+    
+    .badge {
+        padding: 5px 12px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+    
+    .badge-categoria {
+        background: #e3f2fd;
+        color: #1976d2;
+    }
+    
+    .badge-novidade {
+        background: #fff3e0;
+        color: #f57c00;
+    }
+    
+    .badge-isbn {
+        background: #f5f5f5;
+        color: #666;
+    }
+    
+    /* Descrição com Ler Mais */
+    .descricao-section {
+        margin: 20px 0;
+    }
+    
+    .descricao-titulo {
+        font-size: 16px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 10px;
+    }
+    
+    .descricao-texto {
+        font-size: 14px;
+        line-height: 1.6;
+        color: #666;
+        margin-bottom: 10px;
+    }
+    
+    .descricao-texto.collapsed {
+        max-height: 120px;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .descricao-texto.collapsed::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 40px;
+        background: linear-gradient(to bottom, transparent, white);
+    }
+    
+    .btn-ler-mais {
+        background: none;
+        border: none;
+        color: #007bff;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    
+    .btn-ler-mais:hover {
+        text-decoration: underline;
+    }
+    
+    /* Detalhes do Produto - Compacto */
+    .detalhes-produto {
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid #e0e0e0;
+    }
+    
+    .detalhes-lista {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        font-size: 14px;
+    }
+    
+    .detalhe-item {
+        display: flex;
+        gap: 8px;
+    }
+    
+    .detalhe-label {
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .detalhe-valor {
+        color: #666;
+    }
+    
+    /* Coluna Compra - Estilo Amazon */
+    .compra-col {
+        position: sticky;
+        top: 20px;
+        height: fit-content;
+    }
+    
+    .compra-box {
+        background: white;
+        border: 1px solid #d5d9d9;
+        border-radius: 8px;
+        padding: 20px;
+    }
+    
+    .preco-box {
+        margin-bottom: 15px;
+    }
+    
+    .preco-label {
+        font-size: 12px;
+        color: #565959;
+        margin-bottom: 4px;
+    }
+    
+    .preco-valor {
+        font-size: 28px;
+        font-weight: 500;
+        color: #B12704;
+    }
+    
+    .preco-decimal {
+        font-size: 20px;
+        vertical-align: super;
+    }
+    
+    .loja-info {
+        font-size: 13px;
+        color: #666;
+        margin-top: 5px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .btn-comparar-mini {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 4px 10px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.2s;
+    }
+    
+    .btn-comparar-mini:hover {
+        background: #0056b3;
+        transform: translateY(-1px);
+    }
+    
+    /* Status Stock */
+    .stock-status {
+        font-size: 18px;
+        font-weight: 500;
+        margin: 15px 0;
+    }
+    
+    .stock-status.disponivel {
+        color: #007600;
+    }
+    
+    .stock-status.esgotado {
+        color: #B12704;
+    }
+    
+    .stock-aviso {
+        color: #ff9800;
+        font-size: 14px;
+        margin-top: 5px;
+    }
+    
+    /* Botões */
+    .btn-adicionar-carrinho {
+        width: 100%;
+        background: linear-gradient(to bottom, #f7dfa5, #f0c14b);
+        border: 1px solid #a88734;
+        border-radius: 8px;
+        padding: 12px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #111;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-bottom: 10px;
+    }
+    
+    .btn-adicionar-carrinho:hover {
+        background: linear-gradient(to bottom, #f5d78e, #edb933);
+    }
+    
+    .btn-favorito {
+        width: 100%;
+        background: white;
+        border: 1px solid #d5d9d9;
+        border-radius: 8px;
+        padding: 10px;
+        font-size: 13px;
+        font-weight: 500;
+        color: #333;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: block;
+        text-align: center;
+    }
+    
+    .btn-favorito:hover {
+        background: #f7f8f8;
+    }
+    
+    .btn-favorito.remover {
+        color: #c0392b;
+        border-color: #c0392b;
+    }
+    
+    /* Info Envio */
+    .info-envio {
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid #e0e0e0;
+        font-size: 13px;
+    }
+    
+    .info-envio-item {
+        display: flex;
+        align-items: start;
+        gap: 8px;
+        margin-bottom: 8px;
+        color: #666;
+    }
+    
+    .info-envio-icon {
+        color: #007600;
+        font-size: 16px;
+    }
+    
+    .link-comparar {
+        display: block;
+        text-align: center;
+        color: #007bff;
+        font-size: 13px;
+        margin-top: 10px;
+        text-decoration: none;
+    }
+    
+    .link-comparar:hover {
+        text-decoration: underline;
+    }
+    
+    /* Secção Reviews - Compacta */
+    .reviews-section {
+        background: white;
+        border-radius: 8px;
+        padding: 25px;
+        margin-bottom: 20px;
+    }
+    
+    .reviews-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .reviews-titulo {
+        font-size: 20px;
+        font-weight: 600;
+        color: #333;
+        margin: 0;
+    }
+    
+    .reviews-resumo {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .rating-numero {
+        font-size: 32px;
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .rating-estrelas-grande {
+        color: #FFD700;
+        font-size: 20px;
+    }
+    
+    .rating-total {
+        font-size: 14px;
+        color: #666;
+    }
+    
+    .btn-escrever-review {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 24px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+    }
+    
+    .btn-escrever-review:hover {
+        background: #0056b3;
+    }
+    
+    /* Review Item - Compacto */
+    .review-item {
+        padding: 20px 0;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .review-item:last-child {
+        border-bottom: none;
+    }
+    
+    .review-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 10px;
+    }
+    
+    .review-usuario {
+        font-weight: 600;
+        color: #333;
+        font-size: 14px;
+    }
+    
+    .review-verificado {
+        background: #007600;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 3px;
+        font-size: 11px;
+        margin-left: 8px;
+    }
+    
+    .review-data {
+        font-size: 13px;
+        color: #999;
+    }
+    
+    .review-estrelas {
+        color: #FFD700;
+        font-size: 16px;
+        margin-bottom: 8px;
+    }
+    
+    .review-titulo {
+        font-size: 15px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 6px;
+    }
+    
+    .review-texto {
+        font-size: 14px;
+        line-height: 1.5;
+        color: #666;
+    }
+    
+    .reviews-vazio {
+        text-align: center;
+        padding: 40px 20px;
+        color: #999;
+    }
+    
+    /* Responsive */
+    @media (max-width: 1200px) {
+        .detalhe-grid {
+            grid-template-columns: 350px 1fr 320px;
+        }
+    }
+    
+    @media (max-width: 992px) {
+        .detalhe-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .imagem-col {
+            max-width: 380px;
+            margin: 0 auto;
+        }
+        
+        .compra-col {
+            position: static;
+        }
+        
+        .compra-box {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .detalhes-lista {
+            grid-template-columns: 1fr;
+        }
+        
+        .breadcrumb {
+            font-size: 12px;
+            padding: 10px 15px;
+        }
+        
+        .titulo-livro {
+            font-size: 20px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="livro-detalhe-container">
+    <div class="detalhe-content">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+            <a href="{% url 'pagina_principal' %}">Início</a>
+            <span class="breadcrumb-separator">›</span>
+            {% if livro.categoria %}
+                <span>{{ livro.categoria }}</span>
+                <span class="breadcrumb-separator">›</span>
+            {% endif %}
+            <span>{{ livro.titulo }}</span>
+        </div>
+
+        <!-- Grid Principal -->
+        <div class="detalhe-grid">
+            <!-- Coluna 1: Imagem -->
+            <div class="imagem-col">
+                {% if livro.imagem_capa %}
+                    <img src="{{ livro.imagem_capa }}" alt="{{ livro.titulo }}">
+                {% else %}
+                    <div class="livro-sem-imagem">
+                        <span>📚</span>
+                        <p>Imagem não disponível</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Coluna 2: Informação Principal -->
+            <div class="info-col">
+                <!-- Título -->
+                <h1 class="titulo-livro">{{ livro.titulo }}</h1>
+
+                <!-- Autor -->
+                <div class="autor-livro">
+                    por <a href="#">{{ livro.autor }}</a>
+                </div>
+
+                <!-- Rating -->
+                <div class="rating-compacto">
+                    <div class="estrelas-display">
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= rating_medio %}★{% else %}☆{% endif %}
+                        {% endfor %}
+                    </div>
+                    <div class="rating-texto" onclick="document.getElementById('reviews-section').scrollIntoView({behavior: 'smooth'})">
+                        {{ rating_medio|floatformat:1 }} de 5 estrelas ({{ total_reviews }} {% if total_reviews == 1 %}avaliação{% else %}avaliações{% endif %})
+                    </div>
+                </div>
+
+                <!-- Badges -->
+                <div class="badges-row">
+                    {% if livro.categoria %}
+                        <span class="badge badge-categoria">{{ livro.categoria }}</span>
+                    {% endif %}
+                    {% if livro.novidade %}
+                        <span class="badge badge-novidade">✨ Novidade</span>
+                    {% endif %}
+                    {% if livro.isbn %}
+                        <span class="badge badge-isbn">ISBN: {{ livro.isbn }}</span>
+                    {% endif %}
+                </div>
+
+                <!-- Descrição com "Ler mais" -->
+                {% if livro.descricao %}
+                    <div class="descricao-section">
+                        <h3 class="descricao-titulo">Sobre este livro</h3>
+                        <div class="descricao-texto collapsed" id="descricao-texto">
+                            {{ livro.descricao }}
+                        </div>
+                        <button class="btn-ler-mais" id="btn-ler-mais" onclick="toggleDescricao()">
+                            <span id="texto-btn">Ler mais</span>
+                            <span id="icone-btn">▼</span>
+                        </button>
+                    </div>
+                {% endif %}
+
+                <!-- Detalhes do Produto -->
+                <div class="detalhes-produto">
+                    <h3 class="descricao-titulo">Detalhes do Produto</h3>
+                    <div class="detalhes-lista">
+                        <div class="detalhe-item">
+                            <span class="detalhe-label">Formato:</span>
+                            <span class="detalhe-valor">{{ tipo_capa }}</span>
+                        </div>
+                        {% if livro.autor %}
+                            <div class="detalhe-item">
+                                <span class="detalhe-label">Autor:</span>
+                                <span class="detalhe-valor">{{ livro.autor }}</span>
+                            </div>
+                        {% endif %}
+                        {% if livro.categoria %}
+                            <div class="detalhe-item">
+                                <span class="detalhe-label">Categoria:</span>
+                                <span class="detalhe-valor">{{ livro.categoria }}</span>
+                            </div>
+                        {% endif %}
+                        {% if livro.isbn %}
+                            <div class="detalhe-item">
+                                <span class="detalhe-label">ISBN:</span>
+                                <span class="detalhe-valor">{{ livro.isbn }}</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coluna 3: Compra -->
+            <div class="compra-col">
+                <div class="compra-box">
+                    <!-- Preço -->
+                    {% if preco_min %}
+                        <div class="preco-box">
+                            <div class="preco-label">Preço:</div>
+                            <div class="preco-valor">
+                                {{ preco_min|floatformat:2 }}<span class="preco-decimal">€</span>
+                            </div>
+                            {% if loja_min %}
+                                <div class="loja-info">
+                                    <span>em {{ loja_min }}</span>
+                                    <a href="{% url 'comparar_precos' livro.id %}" class="btn-comparar-mini">
+                                        📊 Comparar Preços
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+
+                    <!-- Stock -->
+                    {% if em_stock %}
+                        <div class="stock-status disponivel">
+                            ✓ Em stock
+                        </div>
+                        {% if stock_baixo %}
+                            <div class="stock-aviso">
+                                ⚠️ Apenas {{ stock_disponivel }} unidades restantes
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="stock-status esgotado">
+                            ✗ Temporariamente esgotado
+                        </div>
+                    {% endif %}
+
+                    <!-- Botão Adicionar ao Carrinho -->
+                    {% if preco_min and em_stock %}
+                        <button 
+                            class="btn-adicionar-carrinho"
+                            data-livro-id="{{ livro.id }}"
+                            data-stock="{{ stock_disponivel }}"
+                            data-livro-titulo="{{ livro.titulo|escapejs }}"
+                            data-livro-preco="{{ preco_min }}"
+                            onclick="adicionarAoCarrinho(this.dataset.livroId, this.dataset.livroTitulo, this.dataset.livroPreco)">
+                            🛒 Adicionar ao carrinho
+                        </button>
+                    {% else %}
+                        <button class="btn-adicionar-carrinho" disabled style="opacity: 0.5; cursor: not-allowed;">
+                            Indisponível
+                        </button>
+                    {% endif %}
+
+                    <!-- Botão Favoritos -->
+                    {% if user.is_authenticated %}
+                        {% if esta_nos_favoritos %}
+                            <a href="{% url 'remover_favorito' livro.id %}?next=livro_detalhe" 
+                               class="btn-favorito remover">
+                                💔 Remover dos favoritos
+                            </a>
+                        {% else %}
+                            <a href="{% url 'adicionar_favorito' livro.id %}?next=livro_detalhe" 
+                               class="btn-favorito">
+                                ❤️ Adicionar aos favoritos
+                            </a>
+                        {% endif %}
+                    {% endif %}
+
+                    <!-- Info Envio -->
+                    <div class="info-envio">
+                        <div class="info-envio-item">
+                            <span class="info-envio-icon">📦</span>
+                            <span><strong>Envio GRÁTIS</strong> em compras acima de 20€</span>
+                        </div>
+                        <div class="info-envio-item">
+                            <span class="info-envio-icon">🚚</span>
+                            <span>Entrega em <strong>2-3 dias úteis</strong></span>
+                        </div>
+                    </div>
+
+                    <!-- Link Comparar Preços -->
+                    <a href="{% url 'comparar_precos' livro.id %}" class="link-comparar">
+                        Ver preços em outras lojas →
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Secção de Avaliações -->
+        <div class="reviews-section" id="reviews-section">
+            <div class="reviews-header">
+                <div>
+                    <h2 class="reviews-titulo">Avaliações de clientes</h2>
+                </div>
+                <div class="reviews-resumo">
+                    <div class="rating-numero">{{ rating_medio|floatformat:1 }}</div>
+                    <div>
+                        <div class="rating-estrelas-grande">
+                            {% if rating_medio > 0 %}
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= rating_medio %}★{% else %}☆{% endif %}
+                                {% endfor %}
+                            {% else %}
+                                ☆☆☆☆☆
+                            {% endif %}
+                        </div>
+                        <div class="rating-total">{{ total_reviews }} {% if total_reviews == 1 %}avaliação{% else %}avaliações{% endif %}</div>
+                    </div>
+                    <div>
+                        {% if pode_avaliar %}
+                            <a href="{% url 'submeter_review' livro.id %}" class="btn-escrever-review">
+                                ✍️ Escrever avaliação
+                            </a>
+                        {% elif review_utilizador %}
+                            <div style="font-size: 13px; color: #28a745; margin-bottom: 8px;">✓ Já avaliou este livro</div>
+                            <a href="{% url 'editar_review' review_utilizador.id %}" 
+                               style="font-size: 13px; color: #007bff; text-decoration: none; margin-right: 10px;">
+                                Editar
+                            </a>
+                                     <a href="{% url 'remover_review' review_utilizador.id %}" 
+                                         style="font-size: 13px; color: #dc3545; text-decoration: none;">
+                                          Remover
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de Reviews -->
+            {% if reviews %}
+                {% for review in reviews %}
+                    <div class="review-item">
+                        <div class="review-header">
+                            <div>
+                                <span class="review-usuario">{{ review.utilizador.username }}</span>
+                                {% if review.verificado %}
+                                    <span class="review-verificado">✓ Compra Verificada</span>
+                                {% endif %}
+                            </div>
+                            <span class="review-data">{{ review.data_criacao|date:"d/m/Y" }}</span>
+                        </div>
+                        <div class="review-estrelas">
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}
+                            {% endfor %}
+                        </div>
+                        <h4 class="review-titulo">{{ review.titulo }}</h4>
+                        <p class="review-texto">{{ review.comentario }}</p>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="reviews-vazio">
+                    <p style="font-size: 16px; margin-bottom: 10px;">Ainda não há avaliações para este livro.</p>
+                    {% if pode_avaliar %}
+                        <p style="color: #666;">Seja o primeiro a avaliar!</p>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Voltar -->
+        <div style="text-align: center; margin: 20px 0;">
+            <a href="{% url 'pagina_principal' %}" 
+               style="display: inline-block; color: #007bff; text-decoration: none; font-size: 14px; padding: 10px 20px; border: 1px solid #007bff; border-radius: 6px;">
+                ← Voltar à página principal
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript para "Ler mais" -->
+<script>
+function toggleDescricao() {
+    const descricaoTexto = document.getElementById('descricao-texto');
+    const textBtn = document.getElementById('texto-btn');
+    const iconeBtn = document.getElementById('icone-btn');
+    
+    if (descricaoTexto.classList.contains('collapsed')) {
+        descricaoTexto.classList.remove('collapsed');
+        textBtn.textContent = 'Ler menos';
+        iconeBtn.textContent = '▲';
+    } else {
+        descricaoTexto.classList.add('collapsed');
+        textBtn.textContent = 'Ler mais';
+        iconeBtn.textContent = '▼';
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+
+{% block title %}Registo - Cantos de Papel{% endblock %}
+
+{% block content %}
+<div class="catalog-section">
+  <div class="register-container">
+    <h1>📝 Crie a sua conta</h1>
+    <p style="text-align: center; color: #999; margin-bottom: 10px; font-family: Arial, sans-serif;">
+      Junte-se à nossa comunidade de leitores
+    </p>
+    <form method="post">
+      {% csrf_token %}
+      
+      <h3>🔐 Credenciais de Acesso</h3>
+      
+      <div class="field-group">
+        <label>Email *</label>
+        {{ form.username }}
+      </div>
+      
+      <div class="row">
+        <div class="col">
+          <label>Password *</label>
+          {{ form.password1 }}
+        </div>
+        <div class="col">
+          <label>Confirmar password *</label>
+          {{ form.password2 }}
+        </div>
+      </div>
+      
+      <h3>👤 Informação Pessoal</h3>
+      
+      <div class="row">
+        <div class="col">
+          <label>Primeiro Nome *</label>
+          {{ form.primeiro_nome }}
+        </div>
+        <div class="col">
+          <label>Último Nome *</label>
+          {{ form.ultimo_nome }}
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="col">
+          <label>Telemóvel *</label>
+          {{ form.telefone }}
+        </div>
+        <div class="col">
+          <label>Número de Contribuinte (NIF) *</label>
+          {{ form.nif }}
+        </div>
+      </div>
+
+      <h3>📍 Endereço de Entrega</h3>
+      
+      <div class="field-group">
+        <label>País *</label>
+        {{ form.pais }}
+      </div>
+      
+      <div class="field-group">
+        <label>Morada Completa *</label>
+        {{ form.morada }}
+      </div>
+      
+      <div class="row">
+        <div class="col">
+          <label>Porta *</label>
+          {{ form.porta }}
+        </div>
+        <div class="col">
+          <label>Andar (opcional)</label>
+          {{ form.andar }}
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="col">
+          <label>Código Postal *</label>
+          {{ form.codigo_postal }}
+        </div>
+        <div class="col">
+          <label>Localidade *</label>
+          {{ form.localidade }}
+        </div>
+      </div>
+
+      <div id="form-errors" aria-live="polite"></div>
+
+      <div class="actions">
+        <button type="submit" class="btn">✓ Criar Conta</button>
+        <a href="/accounts/login/" class="btn secondary" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
+          ← Já tem conta? Faça login
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  (function(){
+    function validNIF(nif){
+      if(!/^\d{9}$/.test(nif)) return false;
+      let total = 0;
+      for(let i=0;i<8;i++) total += parseInt(nif[i],10) * (9 - i);
+      let check = 11 - (total % 11);
+      if(check >= 10) check = 0;
+      return check === parseInt(nif[8],10);
+    }
+    
+    function validPhone(t){
+      let s = t.replace(/\s+/g,'').replace(/-/g,'');
+      if(s.startsWith('+351')) s = s.slice(4);
+      return /^\d{9}$/.test(s);
+    }
+    
+    function validCP(cp){
+      return /^\d{4}-\d{3}$/.test(cp);
+    }
+
+    const nifEl = document.getElementById('id_nif');
+    const telEl = document.getElementById('id_telefone');
+    const cpEl = document.getElementById('id_codigo_postal');
+    const submitBtn = document.querySelector('button[type="submit"]');
+    const errDiv = document.getElementById('form-errors');
+
+    function update(){
+      const errors = [];
+      
+      if(nifEl && nifEl.value.trim()){
+        if(!validNIF(nifEl.value.trim())){
+          errors.push('NIF inválido (deve ter 9 dígitos válidos).');
+          nifEl.style.borderColor = '#d32f2f';
+        } else {
+          nifEl.style.borderColor = '#4caf50';
+        }
+      }
+      
+      if(telEl && telEl.value.trim()){
+        if(!validPhone(telEl.value.trim())){
+          errors.push('Telefone inválido (9 dígitos ou +351XXXXXXXXX).');
+          telEl.style.borderColor = '#d32f2f';
+        } else {
+          telEl.style.borderColor = '#4caf50';
+        }
+      }
+      
+      if(cpEl && cpEl.value.trim()){
+        if(!validCP(cpEl.value.trim())){
+          errors.push('Código postal inválido (formato: 1234-567).');
+          cpEl.style.borderColor = '#d32f2f';
+        } else {
+          cpEl.style.borderColor = '#4caf50';
+        }
+      }
+      
+      if(errors.length > 0){
+        errDiv.innerHTML = errors.map(e => '<div style="padding: 8px 0;">⚠️ '+e+'</div>').join('');
+        errDiv.classList.add('active');
+        submitBtn.disabled = true;
+        submitBtn.style.opacity = '0.5';
+        submitBtn.style.cursor = 'not-allowed';
+      } else {
+        errDiv.innerHTML = '';
+        errDiv.classList.remove('active');
+        submitBtn.disabled = false;
+        submitBtn.style.opacity = '1';
+        submitBtn.style.cursor = 'pointer';
+      }
+    }
+
+    [nifEl, telEl, cpEl].forEach(el => {
+      if(!el) return;
+      el.addEventListener('input', update);
+      el.addEventListener('blur', update);
+    });
+
+    // Animación de entrada
+    const container = document.querySelector('.register-container');
+    if (container) {
+      container.style.opacity = '0';
+      container.style.transform = 'translateY(20px)';
+      setTimeout(() => {
+        container.style.transition = 'all 0.5s ease';
+        container.style.opacity = '1';
+        container.style.transform = 'translateY(0)';
+      }, 100);
+    }
+  })();
+</script>
+{% endblock %}

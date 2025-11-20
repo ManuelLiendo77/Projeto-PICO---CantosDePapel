@@ -1,0 +1,755 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Checkout - Cantos de Papel{% endblock %}
+
+{% block content %}
+<div class="checkout-container">
+    <div class="checkout-header">
+        <h1>🛒 Finalizar Pedido</h1>
+        <p style="color:#5d6d7e;margin-bottom:15px;">Confirme os dados de envio e pagamento. Entregamos em 1-2 dias úteis para Portugal continental.</p>
+        <div class="checkout-steps">
+            <div class="step active">1. Carrinho</div>
+            <div class="step active">2. Dados de envio</div>
+            <div class="step">3. Confirmação</div>
+        </div>
+    </div>
+
+    <form method="post" id="checkout-form" class="checkout-form">
+        {% csrf_token %}
+        <input type="hidden" name="carrinho_data" id="carrinho_data">
+        
+        <div class="checkout-content">
+            <!-- Coluna esquerda: Formulário -->
+            <div class="checkout-left">
+                <div class="form-section">
+                    <h2>📋 Dados pessoais</h2>
+                    
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-error">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+                    
+                    <div class="form-group">
+                        <label for="id_nome_completo">{{ form.nome_completo.label }}</label>
+                        {{ form.nome_completo }}
+                        {% if form.nome_completo.errors %}
+                            <span class="error">{{ form.nome_completo.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="id_email">{{ form.email.label }}</label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                                <span class="error">{{ form.email.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="id_telefone">{{ form.telefone.label }}</label>
+                            {{ form.telefone }}
+                            {% if form.telefone.errors %}
+                                <span class="error">{{ form.telefone.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h2>📍 Morada de envio</h2>
+                    
+                    <div class="form-group">
+                        <label for="id_morada">{{ form.morada.label }}</label>
+                        {{ form.morada }}
+                        {% if form.morada.errors %}
+                            <span class="error">{{ form.morada.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="id_cidade">{{ form.cidade.label }}</label>
+                            {{ form.cidade }}
+                            {% if form.cidade.errors %}
+                                <span class="error">{{ form.cidade.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="id_codigo_postal">{{ form.codigo_postal.label }}</label>
+                            {{ form.codigo_postal }}
+                            {% if form.codigo_postal.errors %}
+                                <span class="error">{{ form.codigo_postal.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="id_pais">{{ form.pais.label }}</label>
+                        {{ form.pais }}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="id_notas">{{ form.notas.label }}</label>
+                        {{ form.notas }}
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h2>💳 Método de pagamento</h2>
+                    
+                    <div class="payment-methods">
+                        {% for choice in form.metodo_pago %}
+                            <label class="payment-method">
+                                {{ choice.tag }}
+                                <span class="payment-label">
+                                    {% if choice.data.value == 'mbway' %}
+                                        📱 {{ choice.choice_label }}
+                                    {% elif choice.data.value == 'multibanco' %}
+                                        🏦 {{ choice.choice_label }}
+                                    {% elif choice.data.value == 'cartao' %}
+                                        💳 {{ choice.choice_label }}
+                                    {% endif %}
+                                </span>
+                            </label>
+                        {% endfor %}
+                    </div>
+                    {% if form.metodo_pago.errors %}
+                        <span class="error">{{ form.metodo_pago.errors.0 }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="form-section">
+                    <label class="checkbox-label">
+                        {{ form.aceitar_termos }}
+                        <span>{{ form.aceitar_termos.label }} <a href="#" target="_blank">Ver termos</a></span>
+                    </label>
+                    {% if form.aceitar_termos.errors %}
+                        <span class="error">{{ form.aceitar_termos.errors.0 }}</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Coluna direita: Resumo do pedido -->
+            <div class="checkout-right">
+                <div class="order-summary">
+                    <h2>📦 Resumo do pedido</h2>
+                    
+                    <div class="summary-items" id="summary-items">
+                        <!-- Preenchido dinamicamente via JavaScript -->
+                    </div>
+                    
+                    <!-- Cupão de Desconto -->
+                    <div class="cupom-section">
+                        <h3>🎟️ Cupão de desconto</h3>
+                        <div class="cupom-input-group">
+                            <input type="text" id="cupom-codigo" placeholder="Introduza o código do cupão" maxlength="20">
+                            <button type="button" id="btn-aplicar-cupom">Aplicar</button>
+                        </div>
+                        <input type="hidden" name="cupom_codigo" id="cupom_codigo_hidden">
+                        <div id="cupom-mensagem" class="cupom-mensagem"></div>
+                        <div id="cupom-aplicado" class="cupom-aplicado" style="display: none;">
+                            <div class="cupom-info">
+                                <span class="cupom-codigo-display"></span>
+                                <button type="button" id="btn-remover-cupom" class="btn-remover">✕</button>
+                            </div>
+                            <div class="cupom-descricao"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="summary-totals">
+                        <div class="summary-row">
+                            <span>Subtotal:</span>
+                            <span id="summary-subtotal">0.00€</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>IVA (23%):</span>
+                            <span id="summary-iva">0.00€</span>
+                        </div>
+                        <div class="summary-row" id="desconto-row" style="display: none;">
+                            <span class="desconto-label">Desconto:</span>
+                            <span class="desconto-valor" id="summary-desconto">-0.00€</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Envio:</span>
+                            <span>Incluído</span>
+                        </div>
+                        <div class="summary-row total">
+                            <strong>Total:</strong>
+                            <strong id="summary-total">0.00€</strong>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn-finalizar">
+                        ✓ Confirmar e pagar
+                    </button>
+                    
+                    <a href="/carrinho/" class="btn-volver">← Rever carrinho</a>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<style>
+.checkout-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 30px 20px;
+}
+
+.checkout-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.checkout-header h1 {
+    font-size: 36px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.checkout-steps {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.step {
+    padding: 10px 20px;
+    background: #f0f0f0;
+    border-radius: 20px;
+    color: #999;
+    font-weight: 600;
+}
+
+.step.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.checkout-form {
+    display: block;
+}
+
+.checkout-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+}
+
+.checkout-left {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.form-section {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+.form-section h2 {
+    font-size: 22px;
+    color: #333;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 8px;
+}
+
+.form-input,
+.form-textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.payment-methods {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.payment-method {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.payment-method:hover {
+    border-color: #667eea;
+    background: #f8f9ff;
+}
+
+.payment-method input[type="radio"] {
+    margin-right: 12px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.payment-label {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.error {
+    color: #f44336;
+    font-size: 14px;
+    margin-top: 5px;
+    display: block;
+}
+
+.alert {
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.alert-error {
+    background: #ffebee;
+    color: #c62828;
+    border: 1px solid #ef9a9a;
+}
+
+.checkout-right {
+    position: sticky;
+    top: 20px;
+    height: fit-content;
+}
+
+.order-summary {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+.order-summary h2 {
+    font-size: 22px;
+    color: #333;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.summary-items {
+    margin-bottom: 20px;
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.summary-item:last-child {
+    border-bottom: none;
+}
+
+.item-details {
+    flex: 1;
+}
+
+.item-name {
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+}
+
+.item-quantity {
+    font-size: 13px;
+    color: #666;
+}
+
+.item-price {
+    font-weight: 600;
+    color: #667eea;
+}
+
+.summary-totals {
+    border-top: 2px solid #f0f0f0;
+    padding-top: 15px;
+    margin-top: 15px;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    color: #666;
+}
+
+.summary-row.total {
+    font-size: 20px;
+    color: #333;
+    padding-top: 15px;
+    margin-top: 10px;
+    border-top: 2px solid #667eea;
+}
+
+/* Estilos do Cupão */
+.cupom-section {
+    margin: 20px 0;
+    padding: 20px;
+    background: #faf8f5;
+    border-radius: 8px;
+    border: 2px solid #e8d5c4;
+}
+
+.cupom-section h3 {
+    font-size: 16px;
+    color: #5a3e2b;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.cupom-input-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.cupom-input-group input {
+    flex: 1;
+    padding: 10px 15px;
+    border: 2px solid #e8d5c4;
+    border-radius: 6px;
+    font-size: 14px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+.cupom-input-group input:focus {
+    outline: none;
+    border-color: #c87941;
+}
+
+.cupom-input-group button {
+    padding: 10px 20px;
+    background: #c87941;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.cupom-input-group button:hover {
+    background: #b06835;
+}
+
+.cupom-mensagem {
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+    margin-top: 8px;
+    display: none;
+}
+
+.cupom-mensagem.erro {
+    background: #ffebee;
+    color: #c62828;
+    border: 1px solid #ef9a9a;
+    display: block;
+}
+
+.cupom-mensagem.sucesso {
+    background: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #81c784;
+    display: block;
+}
+
+.cupom-aplicado {
+    background: #e8f5e9;
+    border: 2px solid #81c784;
+    border-radius: 6px;
+    padding: 12px;
+    margin-top: 10px;
+}
+
+.cupom-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.cupom-codigo-display {
+    font-weight: 700;
+    color: #2e7d32;
+    font-size: 14px;
+    font-family: 'Courier New', monospace;
+}
+
+.btn-remover {
+    background: transparent;
+    border: none;
+    color: #c62828;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0 5px;
+    transition: all 0.2s ease;
+}
+
+.btn-remover:hover {
+    color: #d32f2f;
+    transform: scale(1.1);
+}
+
+.cupom-descricao {
+    font-size: 12px;
+    color: #1b5e20;
+}
+
+.desconto-label {
+    color: #2e7d32 !important;
+    font-weight: 600;
+}
+
+.desconto-valor {
+    color: #2e7d32 !important;
+    font-weight: 600;
+}
+
+
+.btn-finalizar {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn-finalizar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+}
+
+.btn-volver {
+    display: block;
+    text-align: center;
+    margin-top: 15px;
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.btn-volver:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 1024px) {
+    .checkout-content {
+        grid-template-columns: 1fr;
+    }
+    
+    .checkout-right {
+        position: static;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<script>
+// Carregar o carrinho e mostrar resumo
+document.addEventListener('DOMContentLoaded', function() {
+    const carrinho = JSON.parse(localStorage.getItem('carrinho') || '[]');
+    
+    if (carrinho.length === 0) {
+        alert('O carrinho está vazio');
+        window.location.href = '/carrinho/';
+        return;
+    }
+    
+    // Guardar dados do carrinho no campo oculto
+    document.getElementById('carrinho_data').value = JSON.stringify(carrinho);
+    
+    // Mostrar itens do carrinho
+    const summaryItems = document.getElementById('summary-items');
+    let subtotal = 0;
+    
+    carrinho.forEach(item => {
+        const itemTotal = parseFloat(item.preco) * item.quantidade;
+        subtotal += itemTotal;
+        
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'summary-item';
+        itemDiv.innerHTML = `
+            <div class="item-details">
+                <div class="item-name">${item.titulo}</div>
+                <div class="item-quantity">x${item.quantidade}</div>
+            </div>
+            <div class="item-price">${itemTotal.toFixed(2)}€</div>
+        `;
+        summaryItems.appendChild(itemDiv);
+    });
+    
+    // Variáveis globais para cálculo
+    window.subtotal = subtotal;
+    window.descontoCupom = 0;
+    
+    // Função para atualizar totais
+    function atualizarTotais() {
+        const iva = window.subtotal * 0.23;
+        const total = window.subtotal + iva - window.descontoCupom;
+        
+        document.getElementById('summary-subtotal').textContent = window.subtotal.toFixed(2) + '€';
+        document.getElementById('summary-iva').textContent = iva.toFixed(2) + '€';
+        document.getElementById('summary-total').textContent = total.toFixed(2) + '€';
+        
+        // Mostrar/ocultar linha de desconto
+        const descontoRow = document.getElementById('desconto-row');
+        if (window.descontoCupom > 0) {
+            descontoRow.style.display = 'flex';
+            document.getElementById('summary-desconto').textContent = '-' + window.descontoCupom.toFixed(2) + '€';
+        } else {
+            descontoRow.style.display = 'none';
+        }
+    }
+    
+    // Atualizar totais iniciais
+    atualizarTotais();
+    
+    // Aplicar cupom
+    document.getElementById('btn-aplicar-cupom').addEventListener('click', function() {
+        const codigoCupom = document.getElementById('cupom-codigo').value.trim().toUpperCase();
+        const mensagemDiv = document.getElementById('cupom-mensagem');
+        
+        if (!codigoCupom) {
+            mensagemDiv.className = 'cupom-mensagem erro';
+            mensagemDiv.textContent = 'Por favor, insira um código de cupom';
+            return;
+        }
+        
+        // Fazer requisição AJAX
+        const formData = new FormData();
+        formData.append('codigo', codigoCupom);
+        formData.append('valor_pedido', window.subtotal);
+        formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+        
+        fetch('/validar-cupom/', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.valido) {
+                // Cupom válido
+                window.descontoCupom = data.desconto;
+                
+                // Atualizar UI
+                document.getElementById('cupom-codigo').value = '';
+                document.getElementById('cupom_codigo_hidden').value = data.codigo;
+                document.querySelector('.cupom-input-group').style.display = 'none';
+                mensagemDiv.style.display = 'none';
+                
+                const cupomAplicado = document.getElementById('cupom-aplicado');
+                cupomAplicado.style.display = 'block';
+                cupomAplicado.querySelector('.cupom-codigo-display').textContent = data.codigo;
+                cupomAplicado.querySelector('.cupom-descricao').textContent = data.descricao;
+                
+                // Atualizar totais
+                atualizarTotais();
+                
+                // Mensagem de sucesso
+                mensagemDiv.className = 'cupom-mensagem sucesso';
+                mensagemDiv.textContent = 'Cupom aplicado com sucesso!';
+                mensagemDiv.style.display = 'block';
+                setTimeout(() => {
+                    mensagemDiv.style.display = 'none';
+                }, 3000);
+                
+            } else {
+                // Cupom inválido
+                mensagemDiv.className = 'cupom-mensagem erro';
+                mensagemDiv.textContent = data.erro;
+            }
+        })
+        .catch(error => {
+            mensagemDiv.className = 'cupom-mensagem erro';
+            mensagemDiv.textContent = 'Erro ao validar cupom. Tente novamente.';
+        });
+    });
+    
+    // Remover cupom
+    document.getElementById('btn-remover-cupom').addEventListener('click', function() {
+        window.descontoCupom = 0;
+        document.getElementById('cupom_codigo_hidden').value = '';
+        document.querySelector('.cupom-input-group').style.display = 'flex';
+        document.getElementById('cupom-aplicado').style.display = 'none';
+        document.getElementById('cupom-mensagem').style.display = 'none';
+        atualizarTotais();
+    });
+    
+    // Aplicar cupom ao pressionar Enter
+    document.getElementById('cupom-codigo').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            document.getElementById('btn-aplicar-cupom').click();
+        }
+    });
+});
+</script>
+{% endblock %}

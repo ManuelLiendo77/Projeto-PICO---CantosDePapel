@@ -1,0 +1,332 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Pedido Confirmado - Cantos de Papel{% endblock %}
+
+{% block content %}
+<div class="confirmacion-container">
+    <div class="confirmacion-content">
+        <div class="success-icon">✓</div>
+        <h1>Pedido confirmado!</h1>
+        <p class="pedido-numero">Pedido #{{ pedido.id }}</p>
+        
+        <div class="success-message">
+            <p>Obrigado pela sua compra. Recebemos o seu pedido corretamente e em breve começaremos a processá-lo.</p>
+            <p>Receberá um email de confirmação em <strong>{{ pedido.email }}</strong></p>
+        </div>
+
+        <div class="order-details-card">
+            <h2>Detalhes do pedido</h2>
+            
+            <div class="detail-row">
+                <span class="label">📦 Artigos:</span>
+                <span class="value">{{ pedido.itens.count }} produto{% if pedido.itens.count != 1 %}s{% endif %}</span>
+            </div>
+            
+            <div class="detail-row">
+                <span class="label">💰 Total:</span>
+                <span class="value total-value">{{ pedido.total }}€</span>
+            </div>
+            
+            <div class="detail-row">
+                <span class="label">📍 Entrega:</span>
+                <span class="value">{{ pedido.morada }}, {{ pedido.cidade }}</span>
+            </div>
+            
+            <div class="detail-row">
+                <span class="label">📅 Data estimada:</span>
+                <span class="value">2-3 dias úteis</span>
+            </div>
+        </div>
+
+        <div class="items-list-card">
+            <h3>Artigos do pedido</h3>
+            {% for item in pedido.itens.all %}
+            <div class="item-row">
+                <div class="item-info">
+                    <strong>{{ item.livro.titulo }}</strong>
+                    <span class="item-qty">x{{ item.quantidade }}</span>
+                </div>
+                <div class="item-price">{{ item.subtotal }}€</div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="action-buttons">
+            <a href="{% url 'pedido_detalhe' pedido.id %}" class="btn-primary-large">
+                📋 Ver detalhe completo
+            </a>
+            <a href="{% url 'perfil_usuario' %}" class="btn-secondary-large">
+                👤 Ir para o meu perfil
+            </a>
+            <a href="/" class="btn-tertiary-large">
+                🏠 Voltar ao início
+            </a>
+        </div>
+
+        <div class="info-box">
+            <p>💡 <strong>O que acontece agora?</strong></p>
+            <ul>
+                <li>Processaremos o seu pedido nas próximas 24 horas</li>
+                <li>Enviaremos um email quando for expedido</li>
+                <li>Poderá acompanhar o estado no seu perfil</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<style>
+.confirmacion-container {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.confirmacion-content {
+    max-width: 700px;
+    width: 100%;
+    background: white;
+    border-radius: 20px;
+    padding: 50px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    text-align: center;
+    animation: fadeIn 0.6s ease;
+}
+
+.success-icon {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 30px;
+    background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+    color: white;
+    font-size: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: scaleIn 0.5s ease;
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.confirmacion-content h1 {
+    font-size: 36px;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.pedido-numero {
+    font-size: 20px;
+    color: #667eea;
+    font-weight: 600;
+    margin-bottom: 30px;
+}
+
+.success-message {
+    background: #e8f5e9;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    border-left: 4px solid #4caf50;
+}
+
+.success-message p {
+    margin: 10px 0;
+    color: #2e7d32;
+    line-height: 1.6;
+}
+
+.order-details-card {
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    text-align: left;
+}
+
+.order-details-card h2 {
+    font-size: 20px;
+    color: #333;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.detail-row:last-child {
+    border-bottom: none;
+}
+
+.detail-row .label {
+    color: #666;
+    font-weight: 600;
+}
+
+.detail-row .value {
+    color: #333;
+    text-align: right;
+}
+
+.total-value {
+    font-size: 24px;
+    font-weight: bold;
+    color: #4caf50 !important;
+}
+
+.items-list-card {
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    text-align: left;
+}
+
+.items-list-card h3 {
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.item-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.item-row:last-child {
+    border-bottom: none;
+}
+
+.item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.item-info strong {
+    color: #333;
+}
+
+.item-qty {
+    color: #666;
+    font-size: 14px;
+}
+
+.item-price {
+    font-weight: 600;
+    color: #667eea;
+}
+
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.btn-primary-large,
+.btn-secondary-large,
+.btn-tertiary-large {
+    padding: 15px 30px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 16px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: inline-block;
+}
+
+.btn-primary-large {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-primary-large:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+}
+
+.btn-secondary-large {
+    background: #f0f0f0;
+    color: #333;
+}
+
+.btn-secondary-large:hover {
+    background: #e0e0e0;
+    transform: translateY(-2px);
+}
+
+.btn-tertiary-large {
+    background: white;
+    color: #667eea;
+    border: 2px solid #667eea;
+}
+
+.btn-tertiary-large:hover {
+    background: #f8f9ff;
+    transform: translateY(-2px);
+}
+
+.info-box {
+    background: #fff3e0;
+    padding: 20px;
+    border-radius: 10px;
+    border-left: 4px solid #ff9800;
+    text-align: left;
+}
+
+.info-box p {
+    margin: 0 0 10px 0;
+    color: #e65100;
+}
+
+.info-box ul {
+    margin: 10px 0 0 20px;
+    color: #e65100;
+}
+
+.info-box li {
+    margin: 8px 0;
+}
+
+@media (max-width: 768px) {
+    .confirmacion-content {
+        padding: 30px 20px;
+    }
+    
+    .confirmacion-content h1 {
+        font-size: 28px;
+    }
+    
+    .action-buttons {
+        gap: 10px;
+    }
+}
+</style>
+
+<script>
+// Limpar o carrinho depois de confirmar o pedido
+localStorage.removeItem('carrinho');
+atualizarContadorCarrinho();
+</script>
+{% endblock %}

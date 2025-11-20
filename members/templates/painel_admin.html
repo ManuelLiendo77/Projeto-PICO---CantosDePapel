@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}Painel de Administração{% endblock %}
+
+{% block content %}
+<div class="catalog-section">
+    <div class="admin-redirect-container">
+        <div class="admin-redirect-icon">🎛️</div>
+        <h1 class="admin-redirect-title">Painel de Administração</h1>
+        <p class="admin-redirect-description">
+            Gerencie todos os aspectos da sua livraria através do painel administrativo completo do Django.
+        </p>
+        <p class="admin-redirect-features">
+            ✅ Adicionar e editar livros<br>
+            ✅ Gerenciar preços e lojas<br>
+            ✅ Administrar usuários<br>
+            ✅ Controlar stock de inventário<br>
+            ✅ Gestão de filmes e trailers
+        </p>
+        <a href="/admin/" class="admin-redirect-button">
+            🚀 Ir para o Painel de Administração
+        </a>
+        <a href="/" class="admin-redirect-back">
+            ← Voltar à Página Principal
+        </a>
+    </div>
+</div>
+
+<style>
+.admin-redirect-container {
+    max-width: 700px;
+    margin: 80px auto;
+    text-align: center;
+    background: linear-gradient(135deg, #fff 0%, #fffef9 100%);
+    padding: 60px 50px;
+    border-radius: 20px;
+    box-shadow: 0 15px 50px rgba(92, 64, 51, 0.2);
+    border: 2px solid #e5c29f;
+}
+
+.admin-redirect-icon {
+    font-size: 5em;
+    margin-bottom: 20px;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.admin-redirect-title {
+    color: #704214;
+    font-size: 2.8em;
+    margin-bottom: 20px;
+    font-weight: 300;
+    letter-spacing: 1px;
+}
+
+.admin-redirect-description {
+    color: #5c4033;
+    font-size: 1.2em;
+    margin-bottom: 30px;
+    line-height: 1.6;
+    font-family: Arial, sans-serif;
+}
+
+.admin-redirect-features {
+    background: #f5e6d3;
+    padding: 25px;
+    border-radius: 12px;
+    color: #704214;
+    font-size: 1.05em;
+    line-height: 2;
+    margin-bottom: 40px;
+    text-align: left;
+    display: inline-block;
+    font-family: Arial, sans-serif;
+}
+
+.admin-redirect-button {
+    display: inline-block;
+    padding: 18px 45px;
+    background: linear-gradient(135deg, #d2691e 0%, #cc5500 100%);
+    color: #fff;
+    text-decoration: none;
+    font-size: 1.3em;
+    font-weight: bold;
+    border-radius: 30px;
+    transition: all 0.3s;
+    font-family: Arial, sans-serif;
+    box-shadow: 0 5px 20px rgba(210, 105, 30, 0.4);
+    margin-bottom: 20px;
+}
+
+.admin-redirect-button:hover {
+    background: linear-gradient(135deg, #cc5500 0%, #b84c00 100%);
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 30px rgba(210, 105, 30, 0.6);
+}
+
+.admin-redirect-back {
+    display: block;
+    margin-top: 25px;
+    color: #704214;
+    text-decoration: none;
+    font-size: 1.1em;
+    font-family: Arial, sans-serif;
+    transition: color 0.3s;
+}
+
+.admin-redirect-back:hover {
+    color: #d2691e;
+    text-decoration: underline;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+</style>
+{% endblock %}

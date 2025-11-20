@@ -1,0 +1,342 @@
+{% load static i18n %}
+<!DOCTYPE html>
+<html lang="pt-PT" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+    <!-- SEO Meta Tags -->
+    <title>{% block title %}Livraria Online - Cantos de Papel | Livros Clássicos e Bestsellers{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}Descubra a melhor livraria online de Portugal. Livros clássicos, bestsellers, ficção e não-ficção com envio rápido em 2-3 dias. Preços com IVA incluído. Mais de 10.000 títulos disponíveis.{% endblock %}">
+    <meta name="keywords" content="{% block meta_keywords %}livraria online, livros portugal, comprar livros, livros clássicos, bestsellers, ficção, literatura, envio rápido, livros baratos{% endblock %}">
+    <meta name="author" content="Livraria Online - Cantos de Papel">
+    <meta name="robots" content="{% block meta_robots %}index, follow{% endblock %}">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+    <meta property="og:url" content="{% block og_url %}{{ request.build_absolute_uri }}{% endblock %}">
+    <meta property="og:title" content="{% block og_title %}Livraria Online - Cantos de Papel | Os Melhores Livros de Portugal{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Descubra milhares de livros com os melhores preços. Envio rápido em 2-3 dias úteis. Literatura clássica e contemporânea.{% endblock %}">
+    <meta property="og:image" content="{% block og_image %}{% static 'members/images/og-image.jpg' %}{% endblock %}">
+    <meta property="og:locale" content="pt_PT">
+    <meta property="og:site_name" content="Livraria Online - Cantos de Papel">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="{% block twitter_url %}{{ request.build_absolute_uri }}{% endblock %}">
+    <meta name="twitter:title" content="{% block twitter_title %}Livraria Online - Cantos de Papel{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}A sua livraria online de confiança. Milhares de títulos com envio rápido.{% endblock %}">
+    <meta name="twitter:image" content="{% block twitter_image %}{% static 'members/images/og-image.jpg' %}{% endblock %}">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="{% block canonical %}{{ request.build_absolute_uri }}{% endblock %}">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{% static 'members/images/favicon.ico' %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'members/images/apple-touch-icon.png' %}">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="{% static 'members/css/styles.css' %}?v=8.0">
+    
+    {% block extra_css %}{% endblock %}
+    
+    <!-- Structured Data - JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BookStore",
+      "name": "Livraria Online - Cantos de Papel",
+      "description": "Livraria online especializada em literatura clássica e contemporânea com envio rápido para toda Portugal",
+      "url": "{{ request.scheme }}://{{ request.get_host }}",
+      "logo": "{{ request.scheme }}://{{ request.get_host }}{% static 'members/images/logo.png' %}",
+      "image": "{{ request.scheme }}://{{ request.get_host }}{% static 'members/images/og-image.jpg' %}",
+      "telephone": "+351-21-XXX-XXXX",
+      "email": "info@livraria-online.pt",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Rua das Flores, 123",
+        "addressLocality": "Lisboa",
+        "postalCode": "1200-195",
+        "addressCountry": "PT"
+      },
+      "priceRange": "€€",
+      "openingHours": "Mo-Fr 09:00-18:00",
+      "paymentAccepted": "MB Way, Multibanco, Credit Card",
+      "currenciesAccepted": "EUR",
+      "areaServed": "PT"
+    }
+    </script>
+    {% block structured_data %}{% endblock %}
+</head>
+<body data-user-auth="{{ request.user.is_authenticated|yesno:'true,false' }}"
+    data-login-url="/accounts/login/?next={{ request.path|urlencode }}">
+    <!-- Header Principal - Cantos de Papel -->
+    <div class="header-cantos">
+        <div class="header-main">
+            <!-- Logo Elegante -->
+            <a href="/" class="logo-cantos">
+                <div class="logo-icon">�</div>
+                <div class="logo-text-wrapper">
+                    <div class="logo-title">{% trans "Cantos de Papel" %}</div>
+                    <div class="logo-subtitle">{% trans "Livraria Online" %}</div>
+                </div>
+            </a>
+
+            <!-- Barra de Pesquisa -->
+            <div class="search-wrapper">
+                <form method="get" action="/" class="search-form-cantos">
+                    <select name="categoria" class="search-category-cantos">
+                                <option value="">{% trans "Todas" %}</option>
+                                <option value="Ficção">{% trans "Ficção" %}</option>
+                                <option value="Romance">{% trans "Romance" %}</option>
+                                <option value="Fantasia">{% trans "Fantasia" %}</option>
+                                <option value="Policial">{% trans "Policial" %}</option>
+                                <option value="Técnicos">{% trans "Técnicos" %}</option>
+                                <option value="Infantil">{% trans "Infantil" %}</option>
+                    </select>
+                    <input type="text" name="q" class="search-input-cantos" 
+                                    placeholder="{% trans 'Pesquisar livros, autores...' %}" 
+                           value="{{ query|default:'' }}" />
+                    <button type="submit" class="search-btn-cantos">
+                        <span class="search-icon-cantos">🔍</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Botões de Conta -->
+            <div class="account-section">
+                {% if user.is_authenticated %}
+                    <!-- Dropdown de Cuenta -->
+                    <div class="account-dropdown-wrapper">
+                        <div class="account-dropdown-btn">
+                            <span class="account-btn-icon">👤</span>
+                            <span>{{ user.username }}</span>
+                            <span>▼</span>
+                        </div>
+                        <div class="account-dropdown-menu">
+                            <a href="/perfil/" class="dropdown-item-cantos">{% trans "👤 Meu Perfil" %}</a>
+                            <a href="{% url 'lista_favoritos' %}" class="dropdown-item-cantos">{% trans "❤️ Favoritos" %}</a>
+                            <a href="/perfil/#pedidos" class="dropdown-item-cantos">{% trans "📦 Os Meus Pedidos" %}</a>
+                            <div class="dropdown-divider-cantos"></div>
+                            <form action="/accounts/logout/" method="post" style="margin: 0;">
+                                {% csrf_token %}
+                                <button type="submit" class="dropdown-item-cantos" style="color: #c0392b;">{% trans "🚪 Terminar Sessão" %}</button>
+                            </form>
+                        </div>
+                    </div>
+                {% else %}
+                    <a href="/accounts/login/" class="account-btn">
+                        <span class="account-btn-icon">👤</span>
+                        <span>{% trans "Entrar" %}</span>
+                    </a>
+                {% endif %}
+
+                <!-- Carrinho -->
+                <div class="cart-btn" onclick="abrirCarrinhoSidebar()" style="cursor: pointer;">
+                    <span class="cart-icon-cantos">🛒</span>
+                    <span>{% trans "Carrinho" %}</span>
+                    <span id="cart-count-header" class="cart-count-cantos">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navegación Secundaria -->
+    <div class="nav-secondary-cantos">
+        <div class="nav-secondary-content">
+            <a href="/" class="nav-link-cantos">{% trans "🏠 Início" %}</a>
+            <a href="/livros/" class="nav-link-cantos">{% trans "📚 Livros" %}</a>
+            <a href="/?filtro=novidades" class="nav-link-cantos">{% trans "✨ Novidades" %}</a>
+            <a href="/?filtro=mais-vendidos" class="nav-link-cantos">{% trans "🔥 Mais Vendidos" %}</a>
+            <a href="/?filtro=ofertas" class="nav-link-cantos">{% trans "🎁 Ofertas" %}</a>
+            <a href="/privacidade/" class="nav-link-cantos">{% trans "ℹ️ Ajuda" %}</a>
+        </div>
+    </div>
+    </div>
+
+    <!-- Contenido principal -->
+    {% block content %}
+    {% endblock %}
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>© 2025 Livraria Clássica - Todos os direitos reservados</p>
+        <p style="margin-top: 10px; color: #666;">A cultura ao seu alcance</p>
+        <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
+            <a href="{% url 'politica_privacidad' %}" style="color: rgba(255,255,255,0.8); text-decoration: none; margin: 0 15px; font-size: 0.9rem; transition: color 0.3s ease;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.8)'">Política de Privacidade</a>
+            <a href="{% url 'terminos_condiciones' %}" style="color: rgba(255,255,255,0.8); text-decoration: none; margin: 0 15px; font-size: 0.9rem; transition: color 0.3s ease;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.8)'">Termos e Condições</a>
+            <a href="{% url 'politica_cookies' %}" style="color: rgba(255,255,255,0.8); text-decoration: none; margin: 0 15px; font-size: 0.9rem; transition: color 0.3s ease;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.8)'">Política de Cookies</a>
+        </div>
+    </div>
+
+    <!-- Overlay do carrinho -->
+    <div id="carrinho-overlay" class="carrinho-overlay" onclick="fecharCarrinhoSidebar()"></div>
+    
+    <!-- Sidebar do carrinho -->
+    <div id="carrinho-sidebar" class="carrinho-sidebar">
+        <div class="carrinho-sidebar-header">
+            <h2 id="carrinho-sidebar-titulo">1 Produto(s) no carrinho</h2>
+            <button class="btn-fechar" onclick="fecharCarrinhoSidebar()">×</button>
+        </div>
+        
+        <div id="carrinho-sidebar-content" class="carrinho-sidebar-content">
+            <!-- Conteúdo dinâmico -->
+        </div>
+        
+        <div class="carrinho-sidebar-footer">
+            <div class="sidebar-subtotal">
+                <span>Subtotal:</span>
+                <strong id="sidebar-subtotal-valor">0,00€</strong>
+            </div>
+            <button class="btn-ver-carrinho-completo" onclick="window.location.href='/carrinho/'">
+                {% trans "Ver carrinho de compras" %}
+            </button>
+            <button class="btn-finalizar-sidebar" onclick="window.location.href='/carrinho/'">
+                {% trans "Finalizar encomenda" %}
+            </button>
+        </div>
+    </div>
+
+    <script>
+    // Sistema de carrinho global
+    let carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+    const MSG_ADICIONADO_CARRINHO = "{% trans '✓ Adicionado ao carrinho!' %}";
+    const TEXTO_CARRINHO_VAZIO = "{% trans 'O seu carrinho está vazio' %}";
+    const ROTULO_PRODUTOS_CARRINHO = "{% trans 'Produto(s) no carrinho' %}";
+
+    function atualizarContadorCarrinho() {
+        const contador = document.getElementById('cart-count');
+        const contadorHeader = document.getElementById('cart-count-header');
+        const totalItens = carrinho.reduce((sum, item) => sum + item.quantidade, 0);
+        
+        if (contador) {
+            contador.textContent = totalItens;
+            contador.style.display = totalItens > 0 ? 'flex' : 'none';
+        }
+        
+        if (contadorHeader) {
+            contadorHeader.textContent = totalItens;
+            contadorHeader.style.display = totalItens > 0 ? 'block' : 'none';
+        }
+    }
+
+    function adicionarAoCarrinho(id, titulo, preco) {
+        const itemExistente = carrinho.find(item => item.id === id);
+        
+        if (itemExistente) {
+            itemExistente.quantidade++;
+        } else {
+            carrinho.push({
+                id: id,
+                titulo: titulo,
+                preco: parseFloat(preco) || 0,
+                quantidade: 1
+            });
+        }
+        
+        localStorage.setItem('carrinho', JSON.stringify(carrinho));
+        atualizarContadorCarrinho();
+        
+    // Mostrar notificação
+    mostrarNotificacao(MSG_ADICIONADO_CARRINHO);
+    }
+
+    function mostrarNotificacao(mensagem) {
+        const notif = document.createElement('div');
+        notif.textContent = mensagem;
+        notif.style.cssText = `
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: #4caf50;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 10000;
+            font-weight: bold;
+            animation: slideIn 0.3s ease;
+        `;
+        document.body.appendChild(notif);
+        
+        setTimeout(() => {
+            notif.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => notif.remove(), 300);
+        }, 2000);
+    }
+
+    function abrirCarrinhoSidebar() {
+        carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+        
+        const overlay = document.getElementById('carrinho-overlay');
+        const sidebar = document.getElementById('carrinho-sidebar');
+        const titulo = document.getElementById('carrinho-sidebar-titulo');
+        const content = document.getElementById('carrinho-sidebar-content');
+        const subtotalValor = document.getElementById('sidebar-subtotal-valor');
+        
+        if (carrinho.length === 0) {
+            titulo.textContent = `0 ${ROTULO_PRODUTOS_CARRINHO}`;
+            content.innerHTML = `
+                <div style="text-align: center; padding: 60px 20px; color: #704214;">
+                    <div style="font-size: 3em; margin-bottom: 15px;">🛒</div>
+                    <p style="font-size: 1.1em;">${TEXTO_CARRINHO_VAZIO}</p>
+                </div>
+            `;
+            subtotalValor.textContent = '0,00€';
+        } else {
+            titulo.textContent = `${carrinho.length} ${ROTULO_PRODUTOS_CARRINHO}`;
+            
+            let html = '';
+            let subtotal = 0;
+            
+            carrinho.forEach((item, index) => {
+                const itemSubtotal = item.preco * item.quantidade;
+                subtotal += itemSubtotal;
+                
+                html += `
+                    <div class="sidebar-produto-item">
+                        <button class="sidebar-btn-remover" onclick="removerItemSidebar(${index}); event.stopPropagation();">×</button>
+                        <div class="sidebar-produto-img">
+                            <span style="font-size: 2em;">📚</span>
+                        </div>
+                        <div class="sidebar-produto-info">
+                            <h4>${item.titulo}</h4>
+                            <p class="sidebar-produto-quantidade">${item.quantidade}x <span class="sidebar-produto-preco">${item.preco.toFixed(2)}€</span></p>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            content.innerHTML = html;
+            subtotalValor.textContent = subtotal.toFixed(2) + '€';
+        }
+        
+        overlay.classList.add('active');
+        sidebar.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function fecharCarrinhoSidebar() {
+        const overlay = document.getElementById('carrinho-overlay');
+        const sidebar = document.getElementById('carrinho-sidebar');
+        
+        overlay.classList.remove('active');
+        sidebar.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    function removerItemSidebar(index) {
+        carrinho.splice(index, 1);
+        localStorage.setItem('carrinho', JSON.stringify(carrinho));
+        atualizarContadorCarrinho();
+        abrirCarrinhoSidebar();
+    }
+
+    // Atualizar contador ao carregar cada página
+    document.addEventListener('DOMContentLoaded', atualizarContadorCarrinho);
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

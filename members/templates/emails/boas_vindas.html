@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bem-vindo à Cantos de Papel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 32px;
+        }
+        .content {
+            padding: 30px;
+        }
+        .welcome-icon {
+            text-align: center;
+            font-size: 80px;
+            margin: 20px 0;
+        }
+        .feature-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #667eea;
+        }
+        .feature-box h3 {
+            margin: 0 0 10px 0;
+            color: #667eea;
+        }
+        .button {
+            display: inline-block;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 CANTOS DE PAPEL</h1>
+            <p style="margin: 10px 0 0 0; font-size: 18px;">A sua livraria online de confiança</p>
+        </div>
+        
+        <div class="content">
+            <div class="welcome-icon">🎉</div>
+            <h2 style="text-align: center; color: #333;">Bem-vindo, {{ user.get_full_name|default:user.username }}!</h2>
+            
+            <p>Ficamos muito felizes por se ter juntado à <strong>Cantos de Papel</strong>. Agora faz parte de uma comunidade de amantes da leitura.</p>
+            
+            <p>Com a sua conta poderá desfrutar de:</p>
+            
+            <div class="feature-box">
+                <h3>🛒 Compras Rápidas</h3>
+                <p>Guarde as suas moradas e dados de pagamento para comprar com um único clique.</p>
+            </div>
+            
+            <div class="feature-box">
+                <h3>📦 Acompanhamento de Encomendas</h3>
+                <p>Consulte o estado das suas encomendas em tempo real a partir do seu perfil.</p>
+            </div>
+            
+            <div class="feature-box">
+                <h3>⭐ Recomendações Personalizadas</h3>
+                <p>Descubra livros selecionados especialmente para si.</p>
+            </div>
+            
+            <div class="feature-box">
+                <h3>🎁 Ofertas Exclusivas</h3>
+                <p>Aceda a promoções especiais para membros registados.</p>
+            </div>
+            
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="http://127.0.0.1:8000/" class="button">
+                    Explorar Livros
+                </a>
+            </div>
+            
+            <p style="color: #666; font-size: 14px; margin-top: 30px;">
+                Se tiver alguma questão, a nossa equipa está aqui para ajudar.
+            </p>
+        </div>
+        
+        <div class="footer">
+            <p><strong>Cantos de Papel</strong></p>
+            <p>Email: <a href="mailto:contacto@cantosedepapel.com" style="color: #667eea;">contacto@cantosedepapel.com</a></p>
+            <p style="margin-top: 20px; font-size: 12px; color: #999;">
+                Não se registou? <a href="#" style="color: #667eea;">Clique aqui</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

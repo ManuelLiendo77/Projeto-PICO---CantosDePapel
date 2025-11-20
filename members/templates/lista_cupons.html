@@ -1,0 +1,274 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Cupons Disponíveis - Cantos de Papel{% endblock %}
+
+{% block content %}
+<div class="cupons-container">
+    <div class="cupons-header">
+        <h1>🎟️ Cupons de Desconto Disponíveis</h1>
+        <p class="cupons-subtitle">Utilize estes códigos no checkout para obter descontos especiais!</p>
+    </div>
+
+    {% if cupons %}
+    <div class="cupons-grid">
+        {% for cupom in cupons %}
+        <div class="cupom-card">
+            <div class="cupom-badge">
+                {% if cupom.tipo_desconto == 'percentagem' %}
+                    <span class="badge-percentagem">{{ cupom.valor|floatformat:0 }}% OFF</span>
+                {% else %}
+                    <span class="badge-valor">€{{ cupom.valor }}</span>
+                {% endif %}
+            </div>
+            
+            <div class="cupom-content">
+                <div class="cupom-codigo">
+                    <span class="codigo-label">Código:</span>
+                    <span class="codigo-valor">{{ cupom.codigo }}</span>
+                    <button class="btn-copiar" onclick="copiarCodigo('{{ cupom.codigo }}')" title="Copiar código">
+                        📋
+                    </button>
+                </div>
+                
+                <p class="cupom-descricao">{{ cupom.descricao }}</p>
+                
+                <div class="cupom-detalhes">
+                    {% if cupom.valor_minimo_pedido > 0 %}
+                    <div class="detalhe-item">
+                        <span class="detalhe-icon">📦</span>
+                        <span class="detalhe-texto">Pedido mínimo: €{{ cupom.valor_minimo_pedido }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="detalhe-item">
+                        <span class="detalhe-icon">⏰</span>
+                        <span class="detalhe-texto">Válido até {{ cupom.data_fim|date:"d/m/Y" }}</span>
+                    </div>
+                    
+                    <div class="detalhe-item">
+                        <span class="detalhe-icon">🔢</span>
+                        <span class="detalhe-texto">
+                            {{ cupom.uso_maximo|add:cupom.vezes_usado|sub:cupom.vezes_usado }} utilizações restantes
+                        </span>
+                    </div>
+                    
+                    <div class="detalhe-item">
+                        <span class="detalhe-icon">👤</span>
+                        <span class="detalhe-texto">Máximo {{ cupom.uso_por_utilizador }} uso(s) por pessoa</span>
+                    </div>
+                </div>
+                
+                <a href="/checkout/" class="btn-usar-cupom">Usar Cupom</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="sem-cupons">
+        <p>😔 Não há cupons disponíveis no momento.</p>
+        <p>Volte em breve para conferir nossas promoções!</p>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.cupons-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+.cupons-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.cupons-header h1 {
+    font-size: 42px;
+    color: #5a3e2b;
+    margin-bottom: 15px;
+}
+
+.cupons-subtitle {
+    font-size: 18px;
+    color: #8b6f47;
+}
+
+.cupons-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 30px;
+}
+
+.cupom-card {
+    background: #faf8f5;
+    border: 3px solid #e8d5c4;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.cupom-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(200, 121, 65, 0.2);
+    border-color: #c87941;
+}
+
+.cupom-badge {
+    background: linear-gradient(135deg, #c87941 0%, #d4a574 100%);
+    padding: 20px;
+    text-align: center;
+}
+
+.badge-percentagem,
+.badge-valor {
+    font-size: 36px;
+    font-weight: 900;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    display: block;
+}
+
+.cupom-content {
+    padding: 25px;
+}
+
+.cupom-codigo {
+    background: white;
+    border: 2px dashed #c87941;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.codigo-label {
+    font-size: 14px;
+    color: #8b6f47;
+    font-weight: 600;
+}
+
+.codigo-valor {
+    font-size: 20px;
+    font-weight: 900;
+    color: #c87941;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 2px;
+    flex: 1;
+    text-align: center;
+}
+
+.btn-copiar {
+    background: transparent;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.btn-copiar:hover {
+    transform: scale(1.2);
+}
+
+.cupom-descricao {
+    font-size: 16px;
+    color: #5a3e2b;
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+.cupom-detalhes {
+    background: white;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.detalhe-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: #5a3e2b;
+}
+
+.detalhe-item:last-child {
+    margin-bottom: 0;
+}
+
+.detalhe-icon {
+    font-size: 18px;
+}
+
+.btn-usar-cupom {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    background: #c87941;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.btn-usar-cupom:hover {
+    background: #b06835;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(200, 121, 65, 0.3);
+}
+
+.sem-cupons {
+    text-align: center;
+    padding: 60px 20px;
+    background: #faf8f5;
+    border-radius: 12px;
+    border: 2px solid #e8d5c4;
+}
+
+.sem-cupons p {
+    font-size: 18px;
+    color: #8b6f47;
+    margin-bottom: 10px;
+}
+
+@media (max-width: 768px) {
+    .cupons-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .cupons-header h1 {
+        font-size: 32px;
+    }
+}
+</style>
+
+<script>
+function copiarCodigo(codigo) {
+    navigator.clipboard.writeText(codigo).then(function() {
+        // Mostrar feedback visual
+        const btn = event.target;
+        const textoOriginal = btn.textContent;
+        btn.textContent = '✓';
+        btn.style.color = '#2e7d32';
+        
+        setTimeout(() => {
+            btn.textContent = textoOriginal;
+            btn.style.color = '';
+        }, 2000);
+        
+        // Alerta opcional
+        alert('Código copiado: ' + codigo);
+    }).catch(function(err) {
+        alert('Erro ao copiar código. Por favor, copie manualmente: ' + codigo);
+    });
+}
+</script>
+{% endblock %}

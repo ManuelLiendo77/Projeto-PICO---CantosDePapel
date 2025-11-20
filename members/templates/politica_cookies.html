@@ -1,0 +1,566 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Política de Cookies - Livraria Online</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: #2d3748;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 60px 40px;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 60px 40px;
+            line-height: 1.8;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .section h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #764ba2;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        .section p {
+            margin-bottom: 15px;
+            color: #4a5568;
+            font-size: 1.05rem;
+        }
+
+        .section ul, .section ol {
+            margin-left: 30px;
+            margin-bottom: 20px;
+        }
+
+        .section li {
+            margin-bottom: 10px;
+            color: #4a5568;
+            font-size: 1.05rem;
+        }
+
+        .cookie-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: #f7fafc;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .cookie-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .cookie-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .cookie-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .cookie-type {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin: 5px 5px 5px 0;
+        }
+
+        .type-essential {
+            background: #48bb78;
+            color: white;
+        }
+
+        .type-functional {
+            background: #4299e1;
+            color: white;
+        }
+
+        .type-analytics {
+            background: #ed8936;
+            color: white;
+        }
+
+        .type-marketing {
+            background: #9f7aea;
+            color: white;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            border-left: 5px solid #667eea;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 10px;
+        }
+
+        .highlight-box strong {
+            color: #667eea;
+            font-size: 1.1rem;
+        }
+
+        .back-button {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-top: 30px;
+        }
+
+        .back-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .footer-section {
+            background: #f7fafc;
+            padding: 40px;
+            text-align: center;
+            border-top: 3px solid #667eea;
+        }
+
+        .footer-section p {
+            color: #4a5568;
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+
+        .footer-section a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .footer-section a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .content {
+                padding: 40px 20px;
+            }
+
+            .section h2 {
+                font-size: 1.5rem;
+            }
+
+            .cookie-table {
+                font-size: 0.9rem;
+            }
+
+            .cookie-table th,
+            .cookie-table td {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍪 Política de Cookies</h1>
+            <p>Transparência sobre como utilizamos cookies no nosso site</p>
+        </div>
+
+        <div class="content">
+            <div class="section">
+                <p style="font-size: 1.1rem; color: #2d3748; margin-bottom: 30px;">
+                    <strong>Última atualização:</strong> 7 de janeiro de 2025
+                </p>
+                <p>
+                    Esta Política de Cookies explica o que são cookies, como os utilizamos e como pode gerir as suas preferências. 
+                    Ao utilizar o nosso website, concorda com o uso de cookies de acordo com esta política.
+                </p>
+            </div>
+
+            <div class="section">
+                <h2>1. O que são Cookies?</h2>
+                <p>
+                    Cookies são pequenos ficheiros de texto que são armazenados no seu dispositivo (computador, tablet ou telemóvel) 
+                    quando visita um website. Permitem que o site reconheça o seu dispositivo e armazene informações sobre as suas 
+                    preferências ou ações passadas.
+                </p>
+                <p>
+                    Os cookies são amplamente utilizados para fazer os websites funcionarem de forma mais eficiente e para fornecer 
+                    informações aos proprietários do site.
+                </p>
+            </div>
+
+            <div class="section">
+                <h2>2. Tipos de Cookies que Utilizamos</h2>
+                <p>
+                    No nosso website, utilizamos diferentes tipos de cookies para diversos propósitos:
+                </p>
+
+                <h3>2.1 Cookies Essenciais</h3>
+                <div class="highlight-box">
+                    <strong>🔒 Estritamente Necessários</strong>
+                    <p style="margin-top: 10px; margin-bottom: 0;">
+                        Estes cookies são essenciais para o funcionamento do website e não podem ser desativados. 
+                        Sem estes cookies, serviços como o carrinho de compras e o checkout não funcionariam.
+                    </p>
+                </div>
+
+                <table class="cookie-table">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Propósito</th>
+                            <th>Duração</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>sessionid</strong></td>
+                            <td>Mantém a sua sessão ativa enquanto navega no site</td>
+                            <td>2 semanas</td>
+                        </tr>
+                        <tr>
+                            <td><strong>csrftoken</strong></td>
+                            <td>Protege contra ataques de falsificação de pedidos (segurança)</td>
+                            <td>1 ano</td>
+                        </tr>
+                        <tr>
+                            <td><strong>messages</strong></td>
+                            <td>Armazena mensagens temporárias do sistema</td>
+                            <td>Sessão</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>2.2 Cookies Funcionais</h3>
+                <div class="highlight-box">
+                    <strong>⚙️ Melhoram a Funcionalidade</strong>
+                    <p style="margin-top: 10px; margin-bottom: 0;">
+                        Permitem que o website se lembre das escolhas que faz (como o seu nome de utilizador, idioma ou região) 
+                        e fornecem funcionalidades melhoradas e mais personalizadas.
+                    </p>
+                </div>
+
+                <table class="cookie-table">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Propósito</th>
+                            <th>Duração</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>cart</strong></td>
+                            <td>Armazena os produtos no seu carrinho de compras</td>
+                            <td>30 dias</td>
+                        </tr>
+                        <tr>
+                            <td><strong>preferences</strong></td>
+                            <td>Guarda as suas preferências de visualização (lista/grelha)</td>
+                            <td>1 ano</td>
+                        </tr>
+                        <tr>
+                            <td><strong>last_visit</strong></td>
+                            <td>Regista a última visita para mostrar conteúdos relevantes</td>
+                            <td>6 meses</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>2.3 Cookies de Análise e Desempenho</h3>
+                <div class="highlight-box">
+                    <strong>📊 Ajudam-nos a Melhorar</strong>
+                    <p style="margin-top: 10px; margin-bottom: 0;">
+                        Recolhem informações sobre como os visitantes utilizam o website, como as páginas mais visitadas 
+                        e se recebem mensagens de erro. Estas informações são anónimas e agregadas.
+                    </p>
+                </div>
+
+                <p><strong>Atualmente não utilizamos cookies de análise de terceiros.</strong></p>
+                <p>
+                    No futuro, poderemos integrar serviços como Google Analytics para compreender melhor como melhorar 
+                    a experiência do utilizador. Caso isso aconteça, esta política será atualizada e você será notificado.
+                </p>
+
+                <h3>2.4 Cookies de Marketing e Publicidade</h3>
+                <div class="highlight-box">
+                    <strong>🎯 Publicidade Relevante</strong>
+                    <p style="margin-top: 10px; margin-bottom: 0;">
+                        Utilizados para entregar anúncios mais relevantes para si e para os seus interesses. 
+                        Também limitam o número de vezes que vê um anúncio e ajudam a medir a eficácia das campanhas.
+                    </p>
+                </div>
+
+                <p><strong>Atualmente não utilizamos cookies de marketing ou publicidade.</strong></p>
+                <p>
+                    Não partilhamos as suas informações com redes de publicidade nem utilizamos cookies para rastreamento 
+                    comportamental. Se no futuro decidirmos implementar estas funcionalidades, pediremos o seu consentimento 
+                    explícito primeiro.
+                </p>
+            </div>
+
+            <div class="section">
+                <h2>3. Cookies de Terceiros</h2>
+                <p>
+                    Alguns cookies são colocados por serviços de terceiros que aparecem nas nossas páginas. 
+                    Atualmente, não utilizamos serviços de terceiros que coloquem cookies no seu dispositivo.
+                </p>
+                <p>
+                    <strong>Possíveis integrações futuras:</strong>
+                </p>
+                <ul>
+                    <li><strong>Google Analytics:</strong> Para análise de tráfego e comportamento do utilizador</li>
+                    <li><strong>Stripe/PayPal:</strong> Para processamento seguro de pagamentos</li>
+                    <li><strong>Redes Sociais:</strong> Para botões de partilha e widgets (Facebook, Instagram, Twitter)</li>
+                </ul>
+                <p>
+                    Caso integremos estes serviços, atualizaremos esta política e solicitaremos o seu consentimento.
+                </p>
+            </div>
+
+            <div class="section">
+                <h2>4. Como Gerir os Seus Cookies</h2>
+                <p>
+                    Você tem o direito de decidir aceitar ou rejeitar cookies. Pode exercer as suas preferências de cookies 
+                    através de diferentes métodos:
+                </p>
+
+                <h3>4.1 Definições do Navegador</h3>
+                <p>
+                    A maioria dos navegadores permite controlar cookies através das definições. Para saber mais sobre como 
+                    gerir e eliminar cookies, visite:
+                </p>
+                <ul>
+                    <li><strong>Google Chrome:</strong> chrome://settings/cookies</li>
+                    <li><strong>Mozilla Firefox:</strong> about:preferences#privacy</li>
+                    <li><strong>Microsoft Edge:</strong> edge://settings/privacy</li>
+                    <li><strong>Safari:</strong> Preferências → Privacidade</li>
+                </ul>
+
+                <h3>4.2 Ferramentas de Gestão de Cookies</h3>
+                <p>
+                    Pode utilizar ferramentas online para gerir cookies em vários sites simultaneamente:
+                </p>
+                <ul>
+                    <li><a href="https://www.youronlinechoices.com/pt/" target="_blank">Your Online Choices</a></li>
+                    <li><a href="https://optout.networkadvertising.org/" target="_blank">Network Advertising Initiative</a></li>
+                </ul>
+
+                <h3>4.3 Cookies Essenciais</h3>
+                <div class="highlight-box">
+                    <strong>⚠️ Atenção:</strong>
+                    <p style="margin-top: 10px; margin-bottom: 0;">
+                        Se bloquear ou eliminar cookies essenciais, algumas partes do website podem não funcionar corretamente. 
+                        Por exemplo, não conseguirá adicionar produtos ao carrinho ou efetuar compras.
+                    </p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>5. Resumo dos Cookies Ativos</h2>
+                <p>
+                    Veja abaixo um resumo de todos os tipos de cookies que utilizamos atualmente:
+                </p>
+
+                <div style="margin: 30px 0;">
+                    <span class="cookie-type type-essential">✅ Essenciais (Sempre Ativos)</span>
+                    <span class="cookie-type type-functional">⚙️ Funcionais (Ativos por Padrão)</span>
+                    <span class="cookie-type type-analytics">📊 Análise (Não Utilizados)</span>
+                    <span class="cookie-type type-marketing">🎯 Marketing (Não Utilizados)</span>
+                </div>
+
+                <table class="cookie-table">
+                    <thead>
+                        <tr>
+                            <th>Categoria</th>
+                            <th>Status</th>
+                            <th>Pode Desativar?</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Cookies Essenciais</strong></td>
+                            <td><span class="cookie-type type-essential">Ativos</span></td>
+                            <td>❌ Não (necessários para funcionalidade básica)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Cookies Funcionais</strong></td>
+                            <td><span class="cookie-type type-functional">Ativos</span></td>
+                            <td>✅ Sim (através das definições do navegador)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Cookies de Análise</strong></td>
+                            <td><span class="cookie-type type-analytics">Inativos</span></td>
+                            <td>➖ Não aplicável (não utilizados atualmente)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Cookies de Marketing</strong></td>
+                            <td><span class="cookie-type type-marketing">Inativos</span></td>
+                            <td>➖ Não aplicável (não utilizados atualmente)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="section">
+                <h2>6. Duração dos Cookies</h2>
+                <p>
+                    Os cookies que utilizamos têm diferentes períodos de duração:
+                </p>
+                <ul>
+                    <li>
+                        <strong>Cookies de Sessão:</strong> Temporários, eliminados quando fecha o navegador
+                    </li>
+                    <li>
+                        <strong>Cookies Persistentes:</strong> Permanecem no dispositivo até expirarem ou serem eliminados manualmente
+                    </li>
+                </ul>
+                <p>
+                    A duração específica de cada cookie está indicada nas tabelas acima.
+                </p>
+            </div>
+
+            <div class="section">
+                <h2>7. Atualizações desta Política</h2>
+                <p>
+                    Podemos atualizar esta Política de Cookies periodicamente para refletir mudanças nas nossas práticas 
+                    ou por outras razões operacionais, legais ou regulamentares.
+                </p>
+                <p>
+                    Recomendamos que consulte esta página regularmente para se manter informado sobre como utilizamos cookies. 
+                    A data da última atualização está indicada no topo desta política.
+                </p>
+                <div class="highlight-box">
+                    <strong>📢 Notificação de Alterações:</strong>
+                    <p style="margin-top: 10px; margin-bottom: 0;">
+                        Se fizermos alterações significativas a esta política (como adicionar novos tipos de cookies), 
+                        iremos notificá-lo através de um aviso no website ou por email.
+                    </p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>8. Mais Informações</h2>
+                <p>
+                    Para mais informações sobre cookies e como proteger a sua privacidade online, pode consultar:
+                </p>
+                <ul>
+                    <li>
+                        <a href="https://www.cnpd.pt/" target="_blank">
+                            Comissão Nacional de Proteção de Dados (CNPD)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://ico.org.uk/for-the-public/online/cookies/" target="_blank">
+                            ICO - Information Commissioner's Office (Reino Unido)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.allaboutcookies.org/" target="_blank">
+                            All About Cookies
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>9. Contacto</h2>
+                <p>
+                    Se tiver questões sobre a nossa utilização de cookies ou sobre esta Política de Cookies, 
+                    pode contactar-nos através de:
+                </p>
+                <div class="highlight-box">
+                    <p style="margin-bottom: 10px;"><strong>📧 Email:</strong> privacidade@livraria-online.pt</p>
+                    <p style="margin-bottom: 10px;"><strong>📞 Telefone:</strong> +351 21 XXX XXXX</p>
+                    <p style="margin-bottom: 10px;"><strong>📍 Morada:</strong> Rua das Flores, 123, 1200-195 Lisboa, Portugal</p>
+                    <p style="margin-bottom: 0;"><strong>🕐 Horário:</strong> Segunda a Sexta, 9h-18h</p>
+                </div>
+            </div>
+
+            <div style="text-align: center;">
+                <a href="{% url 'pagina_principal' %}" class="back-button">← Voltar à Página Principal</a>
+            </div>
+        </div>
+
+        <div class="footer-section">
+            <p>
+                <strong>Livraria Online</strong> - Comprometidos com a sua privacidade
+            </p>
+            <p>
+                <a href="{% url 'politica_privacidad' %}">Política de Privacidade</a> | 
+                <a href="{% url 'terminos_condiciones' %}">Termos e Condições</a> | 
+                <a href="{% url 'politica_cookies' %}">Política de Cookies</a>
+            </p>
+            <p style="margin-top: 20px; font-size: 0.9rem;">
+                © 2025 Livraria Online. Todos os direitos reservados.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

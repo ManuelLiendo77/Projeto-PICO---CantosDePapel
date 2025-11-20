@@ -1,0 +1,57 @@
+# =============================================================================
+# Livraria Online - Requirements
+# =============================================================================
+
+# Core Django
+Django==5.2.6
+asgiref==3.9.2
+sqlparse==0.5.3
+tzdata==2025.2
+
+# Database (PostgreSQL para produção)
+psycopg2-binary==2.9.9  # Descomente para produção com PostgreSQL
+
+# HTTP e Requisições
+requests==2.32.5
+urllib3==2.5.0
+certifi==2025.10.5
+charset-normalizer==3.4.3
+idna==3.10
+
+# Servidor WSGI para Produção
+gunicorn==22.0.0  # Para produção
+whitenoise==6.6.0  # Para servir ficheiros estáticos em produção
+
+# Variáveis de Ambiente (Opcional mas recomendado)
+python-decouple==3.8  # Para gerir configurações
+python-dotenv==1.0.0  # Alternativa para .env
+
+# Segurança
+django-cors-headers==4.3.1  # Se precisar de CORS
+django-csp==3.8  # Content Security Policy
+
+# Monitorização e Logs (Opcional)
+# sentry-sdk==1.40.0  # Para rastreamento de erros
+
+# Email
+# django-ses==3.5.0  # Se usar Amazon SES
+
+# Testes
+# pytest==8.0.0
+# pytest-django==4.7.0
+# coverage==7.4.0
+
+# Ferramentas de Desenvolvimento
+# django-debug-toolbar==4.2.0  # Para debugging
+# django-extensions==3.2.3  # Comandos úteis
+
+# =============================================================================
+# Instalação:
+# pip install -r requirements.txt
+#
+# Para produção, descomente as linhas necessárias:
+# - psycopg2-binary (PostgreSQL)
+# - gunicorn (Servidor WSGI)
+# - whitenoise (Ficheiros estáticos)
+# - sentry-sdk (Monitorização)
+# =============================================================================

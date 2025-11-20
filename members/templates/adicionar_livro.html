@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}Adicionar Livro - Administração{% endblock %}
+
+{% block content %}
+<div class="catalog-section">
+  <div class="form-container">
+    <h2>📚 Adicionar Livro</h2>
+    <form method="post">
+      {% csrf_token %}
+      {{ livro_form.non_field_errors }}
+      
+      <label for="id_titulo">Título *</label>
+      {{ livro_form.titulo.errors }}
+      {{ livro_form.titulo }}
+
+      <div class="row">
+        <div>
+          <label for="id_autor">Autor *</label>
+          {{ livro_form.autor.errors }}
+          {{ livro_form.autor }}
+        </div>
+        <div>
+          <label for="id_isbn">ISBN</label>
+          {{ livro_form.isbn.errors }}
+          {{ livro_form.isbn }}
+        </div>
+      </div>
+
+      <label for="id_descricao">Descrição</label>
+      {{ livro_form.descricao.errors }}
+      {{ livro_form.descricao }}
+
+      <label for="id_imagem_capa">URL da Imagem da Capa</label>
+      {{ livro_form.imagem_capa.errors }}
+      {{ livro_form.imagem_capa }}
+
+      <div class="row">
+        <div>
+          <label for="id_categoria">Categoria</label>
+          {{ livro_form.categoria.errors }}
+          {{ livro_form.categoria }}
+        </div>
+        <div>
+          <div class="checkbox-wrapper">
+            {{ livro_form.novidade }}
+            <label for="id_novidade" style="margin: 0;">Marcar como Novidade</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="checkbox-wrapper">
+        {{ livro_form.tem_filme }}
+        <label for="id_tem_filme" style="margin: 0;">Tem filme relacionado?</label>
+      </div>
+
+      <div class="divider"></div>
+      
+      <div id="filme-fields">
+        <h3 class="subsection-title">🎬 Dados do Filme (opcional)</h3>
+        
+        <label for="id_titulo_filme">Título do Filme</label>
+        {{ filme_form.titulo.errors }}
+        {{ filme_form.titulo }}
+
+        <label for="id_trailer_url">URL do Trailer (YouTube/Vimeo)</label>
+        {{ filme_form.trailer_url.errors }}
+        {{ filme_form.trailer_url }}
+      </div>
+
+      <div class="actions">
+        <button type="submit" class="btn">✓ Adicionar Livro</button>
+        <a href="/painel-admin/" class="btn secondary" style="text-decoration:none; display: inline-flex; align-items: center;">✕ Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Mostrar/ocultar campos do filme dependendo do checkbox tem_filme
+  (function(){
+    const temFilmeInput = document.getElementById('id_tem_filme');
+    const filmeFields = document.getElementById('filme-fields');
+    
+    function toggleFilme() {
+      if (!temFilmeInput) return;
+      if (temFilmeInput.type === 'checkbox') {
+        filmeFields.style.display = temFilmeInput.checked ? 'block' : 'none';
+      } else {
+        filmeFields.style.display = 'block';
+      }
+    }
+    
+    // Estado inicial
+    toggleFilme();
+    
+    // Escuchar cambios
+    if (temFilmeInput) {
+      temFilmeInput.addEventListener('change', toggleFilme);
+    }
+  })();
+</script>
+{% endblock %}

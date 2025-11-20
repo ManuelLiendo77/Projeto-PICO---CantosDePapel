@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - Cantos de Papel{% endblock %}
+
+{% block content %}
+<div class="catalog-section">
+    <div class="login-container">
+        <div class="close-circle" title="Voltar">✕</div>
+        <h1>✨ Bem-vindo!</h1>
+        {% if form.errors %}
+            <div class="error">
+                <strong>⚠️ Erro de Autenticação</strong><br>
+                Nome de utilizador ou palavra-passe inválidos.
+            </div>
+        {% endif %}
+        <form method="post" action="">
+            {% csrf_token %}
+            <div class="field">
+                <input 
+                    type="text" 
+                    name="username" 
+                    id="id_username" 
+                    placeholder="📧 Email" 
+                    value="{{ form.username.value|default:'' }}" 
+                    required
+                    autocomplete="username"
+                />
+            </div>
+            <div class="field">
+                <input 
+                    type="password" 
+                    name="password" 
+                    id="id_password" 
+                    placeholder="🔒 Senha" 
+                    required
+                    autocomplete="current-password"
+                />
+            </div>
+            <div class="inline-row">
+                <label class="checkbox">
+                    <input type="checkbox" name="remember"> 
+                    Manter sessão
+                </label>
+                <a href="{% url 'password_reset' %}" class="forgot">Esqueceu a password?</a>
+            </div>
+            <button type="submit" class="primary">Iniciar Sessão</button>
+
+            <div class="separator"><span>Ou</span></div>
+
+            <a href="/accounts/register/" class="cta">
+                <span class="icon">✉️</span>
+                Não tem conta? Registe-se aqui!
+            </a>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (function(){
+        const closeBtn = document.querySelector('.close-circle');
+        function closeAction(){
+            try{
+                if (window.history.length > 1) {
+                    window.history.back();
+                } else {
+                    window.location.href = '/';
+                }
+            } catch(e){
+                window.location.href = '/';
+            }
+        }
+        if (closeBtn) closeBtn.addEventListener('click', closeAction);
+        document.addEventListener('keydown', function(e){
+            if (e.key === 'Escape' || e.key === 'Esc') {
+                closeAction();
+            }
+        });
+
+        // Animación de entrada
+        const container = document.querySelector('.login-container');
+        if (container) {
+            container.style.opacity = '0';
+            container.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                container.style.transition = 'all 0.5s ease';
+                container.style.opacity = '1';
+                container.style.transform = 'translateY(0)';
+            }, 100);
+        }
+    })();
+</script>
+{% endblock %}
