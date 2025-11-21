@@ -9,15 +9,15 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 # Eliminar usuario si ya existe
-if User.objects.filter(username='manuelvalenteliendo77@gmail.com').exists():
-    User.objects.filter(username='manuelvalenteliendo77@gmail.com').delete()
+if User.objects.filter(username='admin@gmail.com').exists():
+    User.objects.filter(username='admin@gmail.com').delete()
     print("Usuario anterior eliminado.")
 
 # Crear nuevo superusuario
 user = User.objects.create_user(
-    username='manuelvalenteliendo77@gmail.com',
-    email='manuelvalenteliendo77@gmail.com',
-    password='demon1220'
+    username='admin@gmail.com',
+    email='admin@gmail.com',
+    password='12340'
 )
 user.is_superuser = True
 user.is_staff = True
@@ -26,4 +26,4 @@ user.save()
 print(f"✓ Superusuario creado exitosamente!")
 print(f"Email: {user.email}")
 print(f"Username: {user.username}")
-print(f"Contraseña: demon1220")
+print(f"Contraseña: 12340")
