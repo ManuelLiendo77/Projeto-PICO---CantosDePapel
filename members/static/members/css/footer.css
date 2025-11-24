@@ -1,0 +1,77 @@
+/* ================================================
+   FOOTER
+   ================================================ */
+
+.footer {
+    background: linear-gradient(135deg, #1a252f 0%, #2c3e50 50%, #34495e 100%);
+    color: white;
+    text-align: center;
+    padding: 60px 20px 40px;
+    margin-top: 80px;
+    position: relative;
+    overflow: hidden;
+}
+
+.footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--accent-color), var(--secondary-color));
+}
+
+.footer::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,107,53,0.05) 0%, transparent 70%);
+    animation: footerGlow 15s ease-in-out infinite;
+}
+
+@keyframes footerGlow {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+    }
+    50% {
+        transform: translate(10%, 10%) scale(1.1);
+    }
+}
+
+.footer p {
+    color: rgba(255,255,255,0.9);
+    margin: 8px 0;
+    font-size: 0.95rem;
+    position: relative;
+    z-index: 1;
+}
+
+.footer a {
+    color: rgba(255,255,255,0.7);
+    transition: all var(--transition-base);
+    text-decoration: none;
+    position: relative;
+}
+
+.footer a::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--primary-color);
+    transition: width var(--transition-base);
+}
+
+.footer a:hover {
+    color: white;
+}
+
+.footer a:hover::after {
+    width: 100%;
+}

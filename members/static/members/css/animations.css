@@ -1,0 +1,130 @@
+/* ================================================
+   ANIMATIONS & EFFECTS
+   ================================================ */
+
+/* Fade In Up */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Fade In */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Scale In */
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Card Animations */
+.livro-card {
+    animation: scaleIn 0.5s ease-out backwards;
+}
+
+.livro-card:nth-child(1) { animation-delay: 0.05s; }
+.livro-card:nth-child(2) { animation-delay: 0.1s; }
+.livro-card:nth-child(3) { animation-delay: 0.15s; }
+.livro-card:nth-child(4) { animation-delay: 0.2s; }
+.livro-card:nth-child(5) { animation-delay: 0.25s; }
+.livro-card:nth-child(6) { animation-delay: 0.3s; }
+
+.benefit-card {
+    animation: scaleIn 0.8s ease-out backwards;
+}
+
+.benefit-card:nth-child(1) { animation-delay: 0.1s; }
+.benefit-card:nth-child(2) { animation-delay: 0.2s; }
+.benefit-card:nth-child(3) { animation-delay: 0.3s; }
+
+/* Loading Shimmer */
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+.loading-shimmer {
+    animation: shimmer 2s infinite;
+    background: linear-gradient(to right, #f0f0f0 0%, #e0e0e0 20%, #f0f0f0 40%, #f0f0f0 100%);
+    background-size: 1000px 100%;
+}
+
+/* Gradient Shift */
+@keyframes gradientShift {
+    0%, 100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+.animated-gradient-text {
+    background: linear-gradient(90deg, var(--primary-color), var(--accent-color), var(--secondary-color), var(--primary-color));
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradientShift 3s ease infinite;
+}
+
+/* Float Animation */
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.float-animation {
+    animation: float 3s ease-in-out infinite;
+}
+
+/* Glow Effect */
+.glow-on-hover {
+    position: relative;
+}
+
+.glow-on-hover::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, var(--primary-color), var(--accent-color), var(--secondary-color));
+    border-radius: inherit;
+    opacity: 0;
+    z-index: -1;
+    filter: blur(15px);
+    transition: opacity var(--transition-base);
+}
+
+.glow-on-hover:hover::after {
+    opacity: 0.5;
+}
