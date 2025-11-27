@@ -300,6 +300,14 @@ def livro_detalhe(request, livro_id):
     pode_avaliar = not review_utilizador
     esta_nos_favoritos = Favorito.objects.filter(utilizador=request.user, livro=livro).exists()
   
+  # Obter informações do filme se existir
+  filme = None
+  if livro.tem_filme:
+    try:
+      filme = livro.filme
+    except Filme.DoesNotExist:
+      filme = None
+  
   context = {
     'livro': livro,
     'preco_min': preco_min,
@@ -315,6 +323,7 @@ def livro_detalhe(request, livro_id):
     'pode_avaliar': pode_avaliar,
     'review_utilizador': review_utilizador,
     'esta_nos_favoritos': esta_nos_favoritos,
+    'filme': filme,
   }
   
   return render(request, 'livro_detalhe.html', context)

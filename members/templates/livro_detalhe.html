@@ -578,6 +578,162 @@
         .titulo-livro {
             font-size: 20px;
         }
+        
+        .trailer-section {
+            padding: 20px;
+        }
+        
+        .trailer-video-container {
+            height: 300px;
+        }
+    }
+    
+    /* Sección Trailer */
+    .trailer-section {
+        background: white;
+        border-radius: 8px;
+        padding: 30px;
+        margin-bottom: 20px;
+        border: 2px solid #ff6b35;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .trailer-section::before {
+        content: '🎬';
+        position: absolute;
+        top: -20px;
+        right: -20px;
+        font-size: 120px;
+        opacity: 0.05;
+        transform: rotate(15deg);
+    }
+    
+    .trailer-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .trailer-icon {
+        font-size: 40px;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.1);
+        }
+    }
+    
+    .trailer-titulo {
+        font-size: 24px;
+        font-weight: 600;
+        color: #333;
+        margin: 0;
+    }
+    
+    .trailer-subtitulo {
+        font-size: 14px;
+        color: #666;
+        margin: 5px 0 0 0;
+    }
+    
+    .trailer-content {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 25px;
+        align-items: start;
+    }
+    
+    .trailer-video-container {
+        position: relative;
+        width: 100%;
+        height: 0;
+        padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    }
+    
+    .trailer-video-container iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+        border-radius: 8px;
+    }
+    
+    .trailer-info {
+        background: linear-gradient(135deg, #fef5e7 0%, #fdebd0 100%);
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid #e8d5c4;
+    }
+    
+    .trailer-info-item {
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #e8d5c4;
+    }
+    
+    .trailer-info-item:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+    
+    .trailer-info-titulo {
+        font-size: 16px;
+        font-weight: 600;
+        color: #5a3e2b;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .trailer-info-texto {
+        font-size: 14px;
+        color: #6b4e3d;
+        line-height: 1.6;
+    }
+    
+    .plataformas-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 10px;
+    }
+    
+    .plataforma-badge {
+        background: white;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+        color: #5a3e2b;
+        border: 1px solid #d4a574;
+        transition: all 0.2s;
+    }
+    
+    .plataforma-badge:hover {
+        background: #c87941;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(200, 121, 65, 0.3);
+    }
+    
+    @media (max-width: 992px) {
+        .trailer-content {
+            grid-template-columns: 1fr;
+        }
     }
 </style>
 {% endblock %}
@@ -777,6 +933,87 @@
                 </div>
             </div>
         </div>
+
+        <!-- Secção de Trailer do Filme -->
+        {% if livro.tem_filme %}
+            <div class="trailer-section">
+                <div class="trailer-header">
+                    <div class="trailer-icon">🎬</div>
+                    <div>
+                        <h2 class="trailer-titulo">Adaptado para o Cinema</h2>
+                        <p class="trailer-subtitulo">Veja o trailer oficial do filme baseado neste livro</p>
+                    </div>
+                </div>
+                
+                <div class="trailer-content">
+                    <div class="trailer-video-wrapper">
+                        {% if filme and filme.trailer_url %}
+                            <div class="trailer-video-container">
+                                <iframe 
+                                    src="{{ filme.trailer_url }}" 
+                                    title="Trailer de {% if filme.titulo %}{{ filme.titulo }}{% else %}{{ livro.titulo }}{% endif %}"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                    allowfullscreen>
+                                </iframe>
+                            </div>
+                        {% else %}
+                            <div class="trailer-video-container" style="display: flex; align-items: center; justify-content: center; background: #f0f0f0; padding-bottom: 0; height: 400px;">
+                                <div style="text-align: center; color: #999;">
+                                    <div style="font-size: 60px; margin-bottom: 15px;">🎥</div>
+                                    <p>Trailer em breve</p>
+                                    <p style="font-size: 12px; margin-top: 10px;">
+                                        <a href="https://www.youtube.com/results?search_query={{ livro.titulo|urlencode }}+{{ livro.autor|urlencode }}+official+trailer" 
+                                           target="_blank" 
+                                           style="color: #ff6b35; text-decoration: none;">
+                                            Procurar no YouTube →
+                                        </a>
+                                    </p>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="trailer-info">
+                        <div class="trailer-info-item">
+                            <div class="trailer-info-titulo">
+                                📺 Onde Assistir
+                            </div>
+                            <div class="trailer-info-texto">
+                                Verifique a disponibilidade do filme nas seguintes plataformas:
+                            </div>
+                            <div class="plataformas-list">
+                                <span class="plataforma-badge">Netflix</span>
+                                <span class="plataforma-badge">Prime Video</span>
+                                <span class="plataforma-badge">Disney+</span>
+                                <span class="plataforma-badge">HBO Max</span>
+                                <span class="plataforma-badge">Apple TV+</span>
+                            </div>
+                        </div>
+                        
+                        <div class="trailer-info-item">
+                            <div class="trailer-info-titulo">
+                                🎭 Sobre a Adaptação
+                            </div>
+                            <div class="trailer-info-texto">
+                                {% if filme and filme.titulo %}
+                                    <strong>Título do Filme:</strong> {{ filme.titulo }}<br>
+                                {% endif %}
+                                Este livro foi adaptado para o cinema, trazendo a história para as telas de forma emocionante e fiel ao original.
+                            </div>
+                        </div>
+                        
+                        <div class="trailer-info-item">
+                            <div class="trailer-info-titulo">
+                                💡 Dica de Leitura
+                            </div>
+                            <div class="trailer-info-texto">
+                                Leia o livro antes de assistir ao filme para uma experiência completa e aprofundada da história!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
 
         <!-- Secção de Avaliações -->
         <div class="reviews-section" id="reviews-section">
