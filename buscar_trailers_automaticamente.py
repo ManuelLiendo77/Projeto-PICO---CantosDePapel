@@ -9,7 +9,6 @@ django.setup()
 
 from members.models import Livro, Filme
 
-# No necesitas API key de YouTube para buscar, usamos scraping simple
 def buscar_trailer_youtube(titulo_libro, autor):
     """Busca el trailer en YouTube y devuelve el video ID"""
     # Construir query de búsqueda
@@ -26,10 +25,7 @@ def buscar_trailer_youtube(titulo_libro, autor):
         response = requests.get(search_url, headers=headers, timeout=10)
         
         if response.status_code == 200:
-            # Buscar el primer video ID en la respuesta
             content = response.text
-            
-            # Buscar patrón de video ID
             import re
             pattern = r'"videoId":"([a-zA-Z0-9_-]{11})"'
             match = re.search(pattern, content)
@@ -46,8 +42,7 @@ def buscar_trailer_youtube(titulo_libro, autor):
     return None, None
 
 def buscar_onde_assistir(titulo_livro):
-    """Sugiere plataformas donde se puede ver la película"""
-    # Plataformas comunes
+    """Retorna plataformas de streaming disponíveis"""
     plataformas = [
         "Netflix",
         "Amazon Prime Video", 
@@ -57,8 +52,6 @@ def buscar_onde_assistir(titulo_livro):
         "Paramount+"
     ]
     
-    # Por ahora retornamos un mensaje genérico
-    # En producción podrías usar APIs como JustWatch, TMDB, etc.
     return f"Verifique a disponibilidade em: {', '.join(plataformas)}"
 
 def processar_livros_com_filmes():
@@ -100,11 +93,9 @@ def processar_livros_com_filmes():
                 erros += 1
                 
         except Filme.DoesNotExist:
-            # Crear nuevo registro de Filme
             trailer_url, embed_url = buscar_trailer_youtube(livro.titulo, livro.autor)
             
             if trailer_url:
-                # Crear título de película basado en el título del libro
                 titulo_filme = livro.titulo
                 
                 Filme.objects.create(
@@ -115,7 +106,6 @@ def processar_livros_com_filmes():
                 print(f"  ✓ Filme criado com trailer: {trailer_url}")
                 criados += 1
             else:
-                # Crear sin trailer por ahora
                 Filme.objects.create(
                     livro=livro,
                     titulo=livro.titulo,
@@ -128,7 +118,6 @@ def processar_livros_com_filmes():
             print(f"  ❌ Erro: {e}")
             erros += 1
         
-        # Delay para no sobrecargar YouTube
         time.sleep(1)
     
     # Resumen

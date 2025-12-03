@@ -85,7 +85,7 @@ LIVROS_COM_FILMES = [
 ]
 
 def buscar_livro_google(titulo, autor):
-    """Busca un libro en Google Books API"""
+    """Busca informação de livros via Google Books"""
     query = f"{titulo} {autor}".replace(" ", "+")
     url = f"https://www.googleapis.com/books/v1/volumes?q={query}&langRestrict=pt&maxResults=1"
     
@@ -101,7 +101,7 @@ def buscar_livro_google(titulo, autor):
     return None
 
 def extrair_info_livro(item, filme_info):
-    """Extrae información del libro desde Google Books"""
+    """Extrai dados do livro da resposta da API"""
     volume_info = item.get('volumeInfo', {})
     
     info = {
@@ -118,13 +118,11 @@ def extrair_info_livro(item, filme_info):
         'filme': filme_info
     }
     
-    # Extraer ISBN
     for identifier in volume_info.get('industryIdentifiers', []):
         if identifier['type'] in ['ISBN_13', 'ISBN_10']:
             info['isbn'] = identifier['identifier']
             break
     
-    # Extraer imagen de capa (usar la de mejor calidad)
     image_links = volume_info.get('imageLinks', {})
     if 'large' in image_links:
         info['imagem_capa'] = image_links['large'].replace('http://', 'https://')
@@ -136,25 +134,21 @@ def extrair_info_livro(item, filme_info):
     return info
 
 def criar_livro(info):
-    """Cria ou atualiza un libro en la base de datos"""
+    """Cria ou atualiza livro na base de dados"""
     try:
-        # Verificar si ya existe
         if info['isbn']:
             livro_existente = Livro.objects.filter(isbn=info['isbn']).first()
             if livro_existente:
                 print(f"  ℹ️  Livro já existe: {info['titulo']}")
-                # Actualizar para indicar que tiene película
                 if not livro_existente.tem_filme:
                     livro_existente.tem_filme = True
                     livro_existente.save()
                     print(f"  ✓ Atualizado para tem_filme=True")
                 return livro_existente
         
-        # Si no tiene ISBN, generar uno falso único
         if not info['isbn']:
             info['isbn'] = f"9999{random.randint(100000000, 999999999)}"
         
-        # Parsear fecha de publicación
         data_pub = None
         if info['data_publicacao']:
             try:
@@ -167,7 +161,6 @@ def criar_livro(info):
             except:
                 pass
         
-        # Crear nuevo libro
         livro = Livro.objects.create(
             titulo=info['titulo'][:255],
             autor=info['autor'][:255],
@@ -181,13 +174,11 @@ def criar_livro(info):
             novidade=True
         )
         
-        # Obtener o crear loja
         loja, _ = Loja.objects.get_or_create(
             nome='Cantos de Papel',
             defaults={'url': 'https://cantosdepaapel.com'}
         )
         
-        # Crear precio
         preco_base = Decimal('12.99') + (Decimal(random.randint(0, 20)) * Decimal('0.50'))
         Preco.objects.create(
             livro=livro,
