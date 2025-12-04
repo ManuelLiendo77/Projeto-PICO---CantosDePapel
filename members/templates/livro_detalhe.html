@@ -759,7 +759,7 @@
             <a href="{% url 'pagina_principal' %}">Início</a>
             <span class="breadcrumb-separator">›</span>
             {% if livro.categoria %}
-                <span>{{ livro.categoria }}</span>
+                <a href="{% url 'lista_livros' %}?categoria={{ livro.categoria|urlencode }}">{{ livro.categoria }}</a>
                 <span class="breadcrumb-separator">›</span>
             {% endif %}
             <span>{{ livro.titulo }}</span>
