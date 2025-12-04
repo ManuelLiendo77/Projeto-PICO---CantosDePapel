@@ -113,19 +113,18 @@ def pagina_principal(request):
   livros_ids_processados = set()  # Para evitar duplicados
   
   for livro in livros:
-  # Ignorar se já processámos este livro
+    # Ignorar se já processámos este livro
     if livro.id in livros_ids_processados:
       continue
     livros_ids_processados.add(livro.id)
     
-    precos = Preco.objects.filter(livro=livro).select_related('loja')
+    # Usar métodos do modelo otimizados
+    preco_min = livro.obter_preco_minimo()
+    loja_min_obj = livro.obter_loja_preco_minimo()
+    loja_min = loja_min_obj.nome if loja_min_obj else None
     preco_antigo = None
-    preco_min = None
-    loja_min = None
-    if precos:
-      preco_min_obj = min(precos, key=lambda p: p.preco)
-      preco_min = preco_min_obj.preco
-      loja_min = preco_min_obj.loja.nome
+    
+    if preco_min:
       # Calcular precio con descuento si está en oferta
       if livro.em_oferta and livro.desconto_percentagem > 0:
         preco_antigo = preco_min
@@ -185,10 +184,7 @@ def lista_livros(request):
   # Obter livros com preços para filtragem por preço
   livros_com_preco = []
   for livro in livros:
-    precos = Preco.objects.filter(livro=livro)
-    preco_min_livro = None
-    if precos.exists():
-      preco_min_livro = min(precos, key=lambda p: p.preco).preco
+    preco_min_livro = livro.obter_preco_minimo()
     
     # Aplicar filtro de precio
     incluir = True
@@ -265,15 +261,11 @@ def lista_livros(request):
 # Página de detalhe do livro (estilo Amazon)
 def livro_detalhe(request, livro_id):
   livro = get_object_or_404(Livro, id=livro_id)
-  precos = Preco.objects.filter(livro=livro).select_related('loja')
   
-  # Encontrar o preço mínimo
-  preco_min = None
-  loja_min = None
-  if precos:
-    preco_min_obj = min(precos, key=lambda p: p.preco)
-    preco_min = preco_min_obj.preco
-    loja_min = preco_min_obj.loja.nome
+  # Usar métodos do modelo para obter preços
+  preco_min = livro.obter_preco_minimo()
+  loja_min_obj = livro.obter_loja_preco_minimo()
+  loja_min = loja_min_obj.nome if loja_min_obj else None
   
   # Informações adicionais
   import random
@@ -285,18 +277,18 @@ def livro_detalhe(request, livro_id):
   stock_disponivel = livro.stock
   stock_baixo = livro.stock_baixo()
   
-  # Avaliações
-  reviews = livro.reviews.all().select_related('utilizador')
+  # Avaliações - otimizado com select_related
+  reviews = livro.reviews.select_related('utilizador').all()
   rating_medio = livro.rating_medio()
   total_reviews = livro.total_reviews()
   
-  # Verificar se o utilizador pode avaliar (se está autenticado e ainda não avaliou)
+  # Verificar se o utilizador pode avaliar
   pode_avaliar = False
   review_utilizador = None
   esta_nos_favoritos = False
   
   if request.user.is_authenticated:
-    review_utilizador = reviews.filter(utilizador=request.user).first()
+    review_utilizador = Review.objects.filter(livro=livro, utilizador=request.user).first()
     pode_avaliar = not review_utilizador
     esta_nos_favoritos = Favorito.objects.filter(utilizador=request.user, livro=livro).exists()
   

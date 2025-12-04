@@ -37,7 +37,7 @@ class Livro(models.Model):
   stock = models.IntegerField(default=0, help_text="Quantidade disponível em stock")
   stock_minimo = models.IntegerField(default=5, help_text="Alerta quando stock está baixo")
   
-  # Novos campos para ofertas e mais vendidos
+  # Campos para ofertas e mais vendidos
   em_oferta = models.BooleanField(default=False, help_text="Livro em oferta/promoção")
   desconto_percentagem = models.DecimalField(max_digits=5, decimal_places=2, default=0, help_text="Percentagem de desconto (0-100)")
   mais_vendido = models.BooleanField(default=False, help_text="Marcar como mais vendido")
@@ -64,10 +64,26 @@ class Livro(models.Model):
     """Retorna o número total de avaliações"""
     return self.reviews.count()
   
+  def obter_preco_minimo(self):
+    """Retorna o preço mínimo entre todas as lojas"""
+    preco_obj = self.preco_set.order_by('preco').first()
+    return preco_obj.preco if preco_obj else None
+  
+  def obter_loja_preco_minimo(self):
+    """Retorna a loja com o preço mais baixo"""
+    preco_obj = self.preco_set.select_related('loja').order_by('preco').first()
+    return preco_obj.loja if preco_obj else None
+  
   class Meta:
     verbose_name = "Livro"
     verbose_name_plural = "Livros"
     ordering = ['titulo']
+    indexes = [
+      models.Index(fields=['categoria']),
+      models.Index(fields=['autor']),
+      models.Index(fields=['tem_filme']),
+      models.Index(fields=['-vendas_totais']),
+    ]
 
 
 # Modelo para lojas
@@ -96,6 +112,9 @@ class Preco(models.Model):
   class Meta:
     verbose_name = "Preço"
     verbose_name_plural = "Preços"
+    indexes = [
+      models.Index(fields=['livro', 'preco']),
+    ]
 
 
 # Modelo para filmes relacionados a livros
@@ -145,6 +164,19 @@ class Pedido(models.Model):
   # Informações adicionais
   notas = models.TextField(blank=True)
   numero_rastreio = models.CharField(max_length=100, blank=True)
+  
+  def calcular_subtotal(self):
+    """Calcula o subtotal dos itens (sem IVA e desconto)"""
+    return sum(item.subtotal for item in self.itens.all())
+  
+  def calcular_iva(self, taxa_iva=0.23):
+    """Calcula o valor do IVA"""
+    return self.subtotal * taxa_iva
+  
+  def calcular_total(self):
+    """Calcula o total do pedido (subtotal + IVA - desconto)"""
+    total = self.subtotal + self.iva - self.desconto_cupom
+    return max(total, 0)  # Não pode ser negativo
   
   def __str__(self):
     return f"Pedido #{self.id} - {self.utilizador.username} - {self.status}"
