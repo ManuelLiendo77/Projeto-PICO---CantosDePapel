@@ -37,7 +37,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="{% static 'members/images/apple-touch-icon.png' %}">
     
     <!-- CSS Unificado -->
-    <link rel="stylesheet" href="{% static 'members/css/styles-unified.css' %}?v=11.0">
+    <link rel="stylesheet" href="{% static 'members/css/styles-unified.css' %}?v=14.0">
     
     {% block extra_css %}{% endblock %}
     
@@ -71,15 +71,30 @@
 </head>
 <body data-user-auth="{{ request.user.is_authenticated|yesno:'true,false' }}"
     data-login-url="/accounts/login/?next={{ request.path|urlencode }}">
-    <!-- Header Principal - Cantos de Papel -->
+    <!-- Barra Superior de Enlaces -->
+    <div class="top-bar-cantos">
+        <div class="top-bar-content">
+            <div class="top-bar-links">
+                <a href="/rede-livrarias/" class="top-bar-link">Rede de livrarias</a>
+                <span class="top-bar-separator">|</span>
+                <a href="/clube-leitura/" class="top-bar-link">Cartão Leitor Cantos de Papel</a>
+                <span class="top-bar-separator">|</span>
+                <a href="/agenda-cultural/" class="top-bar-link">Agenda cultural</a>
+                <span class="top-bar-separator">|</span>
+                <a href="/blogue/" class="top-bar-link">Blogue</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header Principal - Estilo Bertrand -->
     <div class="header-cantos">
         <div class="header-main">
-            <!-- Logo Elegante -->
-            <a href="/" class="logo-cantos">
-                <div class="logo-icon">�</div>
-                <div class="logo-text-wrapper">
-                    <div class="logo-title">{% trans "Cantos de Papel" %}</div>
-                    <div class="logo-subtitle">{% trans "Livraria Online" %}</div>
+            <!-- Logo Estilo Bertrand -->
+            <a href="/" class="logo-bertrand-style">
+                <div class="logo-square">CP</div>
+                <div class="logo-text-bertrand">
+                    <div class="logo-name">CANTOS DE PAPEL</div>
+                    <div class="logo-tagline">LIVREIROS</div>
                 </div>
             </a>
 
@@ -104,15 +119,15 @@
                 </form>
             </div>
 
-            <!-- Botões de Conta -->
+            <!-- Botões de Conta Estilo Bertrand -->
             <div class="account-section">
                 {% if user.is_authenticated %}
                     <!-- Dropdown de Cuenta -->
                     <div class="account-dropdown-wrapper">
                         <div class="account-dropdown-btn">
-                            <span class="account-btn-icon">👤</span>
-                            <span>{{ user.username }}</span>
-                            <span>▼</span>
+                            <div class="icon-circle">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                            </div>
                         </div>
                         <div class="account-dropdown-menu">
                             <a href="/perfil/" class="dropdown-item-cantos">{% trans "👤 Meu Perfil" %}</a>
@@ -127,32 +142,83 @@
                     </div>
                 {% else %}
                     <a href="/accounts/login/" class="account-btn">
-                        <span class="account-btn-icon">👤</span>
-                        <span>{% trans "Entrar" %}</span>
+                        <div class="icon-circle">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                        </div>
                     </a>
                 {% endif %}
 
+                <!-- Favoritos -->
+                <a href="{% url 'lista_favoritos' %}" class="account-btn">
+                    <div class="icon-circle">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                    </div>
+                </a>
+
                 <!-- Carrinho -->
                 <div class="cart-btn" onclick="abrirCarrinhoSidebar()" style="cursor: pointer;">
-                    <span class="cart-icon-cantos">🛒</span>
-                    <span>{% trans "Carrinho" %}</span>
-                    <span id="cart-count-header" class="cart-count-cantos">0</span>
+                    <div class="icon-circle">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                        <span id="cart-count-header" class="cart-count-badge">0</span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Navegación Secundaria -->
+    <!-- Navegación Secundaria Estilo Bertrand -->
     <div class="nav-secondary-cantos">
         <div class="nav-secondary-content">
-            <a href="/" class="nav-link-cantos">{% trans "🏠 Início" %}</a>
-            <a href="/livros/" class="nav-link-cantos">{% trans "📚 Livros" %}</a>
-            <a href="/?filtro=novidades" class="nav-link-cantos">{% trans "✨ Novidades" %}</a>
-            <a href="/?filtro=mais-vendidos" class="nav-link-cantos">{% trans "🔥 Mais Vendidos" %}</a>
-            <a href="/?filtro=ofertas" class="nav-link-cantos">{% trans "🎁 Ofertas" %}</a>
-            <a href="/privacidade/" class="nav-link-cantos">{% trans "ℹ️ Ajuda" %}</a>
+            <button class="menu-toggle-btn" onclick="toggleMenu()">
+                <span class="menu-icon">☰</span>
+                <span>Menu</span>
+            </button>
+            <a href="/livros/?filtro=natal" class="nav-link-cantos">{% trans "Natal até -50%" %}</a>
+            <a href="/?filtro=novidades" class="nav-link-cantos">{% trans "Novidades" %}</a>
+            <a href="/livros/?categoria=Ficção" class="nav-link-cantos">{% trans "Literatura" %}</a>
+            <a href="/livros/?categoria=Infantil" class="nav-link-cantos">{% trans "Infantis e juvenis" %}</a>
+            <a href="/livros/?categoria=Técnicos" class="nav-link-cantos">{% trans "Livros em Inglês" %}</a>
+            <a href="/livros/" class="nav-link-cantos">{% trans "Livrólicos" %}</a>
         </div>
     </div>
+    </div>
+
+    <!-- Menú Lateral Bertrand -->
+    <div id="menu-lateral-overlay" class="menu-lateral-overlay" onclick="cerrarMenuLateral()"></div>
+    <div id="menu-lateral" class="menu-lateral">
+        <div class="menu-lateral-header">
+            <div class="menu-lateral-logo">
+                <div class="logo-square-menu">CP</div>
+                <div class="logo-text-menu">
+                    <div class="logo-name-menu">CANTOS DE PAPEL</div>
+                    <div class="logo-tagline-menu">LIVREIROS</div>
+                </div>
+            </div>
+            <button class="menu-close-btn" onclick="cerrarMenuLateral()">×</button>
+        </div>
+        <div class="menu-lateral-content">
+            <div class="menu-tabs">
+                <button class="menu-tab active" onclick="cambiarTab('online')">LIVRARIA ONLINE</button>
+                <button class="menu-tab" onclick="cambiarTab('lojas')">AS NOSSAS LIVRARIAS</button>
+            </div>
+            <div id="tab-online" class="tab-content active">
+                <a href="/livros/" class="menu-item">Livros <span class="menu-arrow">›</span></a>
+                <a href="/ebooks/" class="menu-item">eBooks <span class="menu-arrow">›</span></a>
+                <a href="/audiolivros/" class="menu-item">Audiolivros <span class="menu-arrow">›</span></a>
+                <a href="/ereader/" class="menu-item">eReader <span class="menu-arrow">›</span></a>
+                <a href="/livros-escolares/" class="menu-item">Livros Escolares <span class="menu-arrow">›</span></a>
+                <a href="/apoio-escolar/" class="menu-item">Apoio Escolar <span class="menu-arrow">›</span></a>
+                <a href="/livrolicos/" class="menu-item">Livrólicos <span class="menu-arrow">›</span></a>
+                <a href="/papelaria/" class="menu-item">Papelaria <span class="menu-arrow">›</span></a>
+                <a href="/jogos-brinquedos/" class="menu-item">Jogos e Brinquedos <span class="menu-arrow">›</span></a>
+                <a href="/conexoes-literarias/" class="menu-item menu-item-destaque">Conexões Literárias <span class="menu-arrow">→</span></a>
+                <a href="/fale-livreiro/" class="menu-item menu-item-gray">Fale com o seu livreiro <span class="menu-arrow">→</span></a>
+                <a href="/leitor-bertrand/" class="menu-item menu-item-dark">Leitor Bertrand <span class="menu-arrow">→</span></a>
+            </div>
+            <div id="tab-lojas" class="tab-content">
+                <p class="menu-info">As nossas lojas físicas</p>
+            </div>
+        </div>
     </div>
 
     <!-- Contenido principal -->
@@ -160,13 +226,36 @@
     {% endblock %}
 
     <!-- Footer -->
-    <div class="footer">
-        <p>© 2025 Livraria Clássica - Todos os direitos reservados</p>
-        <p style="margin-top: 10px; color: #666;">A cultura ao seu alcance</p>
-        <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
-            <a href="{% url 'politica_privacidad' %}" style="color: rgba(255,255,255,0.8); text-decoration: none; margin: 0 15px; font-size: 0.9rem; transition: color 0.3s ease;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.8)'">Política de Privacidade</a>
-            <a href="{% url 'terminos_condiciones' %}" style="color: rgba(255,255,255,0.8); text-decoration: none; margin: 0 15px; font-size: 0.9rem; transition: color 0.3s ease;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.8)'">Termos e Condições</a>
-            <a href="{% url 'politica_cookies' %}" style="color: rgba(255,255,255,0.8); text-decoration: none; margin: 0 15px; font-size: 0.9rem; transition: color 0.3s ease;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.8)'">Política de Cookies</a>
+    <div class="footer-cantos">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Cantos de Papel</h3>
+                <p>A sua livraria online de confiança desde 2025</p>
+                <p style="margin-top: 15px; color: rgba(255,255,255,0.7);">A cultura ao seu alcance</p>
+            </div>
+            <div class="footer-section">
+                <h4>Links Úteis</h4>
+                <a href="/livros/">Catálogo</a>
+                <a href="/?filtro=novidades">Novidades</a>
+                <a href="/?filtro=mais-vendidos">Mais Vendidos</a>
+                <a href="/?filtro=ofertas">Ofertas</a>
+            </div>
+            <div class="footer-section">
+                <h4>Apoio ao Cliente</h4>
+                <a href="{% url 'politica_privacidad' %}">Política de Privacidade</a>
+                <a href="{% url 'terminos_condiciones' %}">Termos e Condições</a>
+                <a href="{% url 'politica_cookies' %}">Política de Cookies</a>
+                <a href="/privacidade/">Contacto</a>
+            </div>
+            <div class="footer-section">
+                <h4>Newsletter</h4>
+                <p>Receba as nossas novidades e promoções</p>
+                <input type="email" placeholder="O seu email" class="footer-newsletter-input">
+                <button class="footer-newsletter-btn">Subscrever</button>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2025 Cantos de Papel - Todos os direitos reservados</p>
         </div>
     </div>
 
@@ -333,8 +422,41 @@
         abrirCarrinhoSidebar();
     }
 
-    // Atualizar contador ao carregar cada página
+    // Atualizar contador al carregar cada página
     document.addEventListener('DOMContentLoaded', atualizarContadorCarrinho);
+
+    // Toggle Menu Lateral
+    function toggleMenu() {
+        const overlay = document.getElementById('menu-lateral-overlay');
+        const menu = document.getElementById('menu-lateral');
+        overlay.classList.add('active');
+        menu.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function cerrarMenuLateral() {
+        const overlay = document.getElementById('menu-lateral-overlay');
+        const menu = document.getElementById('menu-lateral');
+        overlay.classList.remove('active');
+        menu.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    function cambiarTab(tab) {
+        const tabs = document.querySelectorAll('.menu-tab');
+        const contents = document.querySelectorAll('.tab-content');
+        
+        tabs.forEach(t => t.classList.remove('active'));
+        contents.forEach(c => c.classList.remove('active'));
+        
+        if (tab === 'online') {
+            tabs[0].classList.add('active');
+            document.getElementById('tab-online').classList.add('active');
+        } else {
+            tabs[1].classList.add('active');
+            document.getElementById('tab-lojas').classList.add('active');
+        }
+    }
     </script>
 
     {% block extra_js %}{% endblock %}

@@ -1,7 +1,7 @@
 /* ================================================
    LIVRARIA CANTOS DE PAPEL - CSS UNIFICADO
    Todos los estilos en un solo archivo
-   Version: 11.0
+   Version: 14.0 - Réplica Exacta Bertrand
    ================================================ */
 
 /* ================================================
@@ -25,6 +25,8 @@
     --transition-fast: 0.2s ease;
     --transition-base: 0.3s ease;
     --transition-slow: 0.5s ease;
+    --bertrand-green: #2d5a4a;
+    --bertrand-red: #c44536;
 }
 
 * {
@@ -68,18 +70,16 @@ body {
 }
 
 /* ================================================
-   2. HEADER
+   2. HEADER ESTILO BERTRAND
    ================================================ */
 .header-cantos {
-    background: linear-gradient(to bottom, rgba(255,255,255,0.95), rgba(248,245,240,0.98));
-    backdrop-filter: blur(10px);
-    padding: 18px 30px;
-    border-bottom: 1px solid rgba(139,115,85,0.15);
-    box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+    background: #d5d5d5;
+    padding: 20px 40px;
+    border-bottom: none;
+    box-shadow: none;
     position: sticky;
     top: 0;
     z-index: 1000;
-    transition: all var(--transition-base);
 }
 
 .header-main {
@@ -87,101 +87,112 @@ body {
     margin: 0 auto;
     display: flex;
     align-items: center;
-    gap: 25px;
+    gap: 30px;
 }
 
-.logo-cantos {
+/* Logo Estilo Bertrand */
+.logo-bertrand-style {
     text-decoration: none;
     display: flex;
     align-items: center;
-    gap: 10px;
-    transition: transform var(--transition-fast);
+    gap: 12px;
+    transition: opacity 0.2s;
 }
 
-.logo-cantos:hover {
-    transform: translateY(-2px);
+.logo-bertrand-style:hover {
+    opacity: 0.8;
 }
 
-.logo-icon {
-    font-size: 2.2rem;
-    background: linear-gradient(135deg, #000080, #4a90e2);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+.logo-square {
+    background: #e74c3c;
+    color: white;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 900;
+    letter-spacing: -1px;
 }
 
-.logo-cantos:hover .logo-icon {
-    transform: scale(1.1) rotate(-5deg);
-}
-
-.logo-text-wrapper {
+.logo-text-bertrand {
     display: flex;
     flex-direction: column;
 }
 
-.logo-title {
-    font-size: 1.3rem;
-    font-weight: 700;
-    background: linear-gradient(135deg, #000080, #4a90e2);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+.logo-name {
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: #2c3e50;
     line-height: 1;
-    letter-spacing: -0.5px;
+    letter-spacing: 1px;
 }
 
-.logo-subtitle {
-    font-size: 0.7rem;
-    color: var(--text-light);
+.logo-tagline {
+    font-size: 0.75rem;
+    color: #e74c3c;
     text-transform: uppercase;
-    letter-spacing: 2px;
-    font-weight: 500;
+    letter-spacing: 3px;
+    font-weight: 600;
+}
+
+/* Ocultar logo antiguo */
+.logo-cantos {
+    display: none;
+}
+
+.logo-icon,
+.logo-text-wrapper,
+.logo-title,
+.logo-subtitle {
+    display: none;
 }
 
 .search-wrapper {
     flex: 1;
-    max-width: 650px;
+    max-width: 750px;
 }
 
 .search-form-cantos {
     display: flex;
-    border: 2px solid rgba(139,115,85,0.2);
-    border-radius: 50px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
     overflow: hidden;
     background: white;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-    transition: all var(--transition-base);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: all 0.3s;
 }
 
 .search-form-cantos:focus-within {
-    border-color: var(--secondary-color);
-    box-shadow: 0 6px 25px rgba(74,144,226,0.15);
-    transform: translateY(-2px);
+    border-color: #e74c3c;
+    box-shadow: 0 4px 12px rgba(231,76,60,0.15);
+    transform: translateY(-1px);
 }
 
 .search-category-cantos {
     border: none;
-    padding: 10px 18px;
-    background: transparent;
-    border-right: 2px solid rgba(139,115,85,0.1);
+    padding: 12px 15px;
+    background: white;
+    border-right: 1px solid #e0e0e0;
     cursor: pointer;
     font-size: 0.9rem;
-    font-weight: 500;
-    color: var(--text-dark);
-    transition: all var(--transition-fast);
+    font-weight: 400;
+    color: #333;
+    min-width: 100px;
 }
 
 .search-category-cantos:hover {
-    background: rgba(74,144,226,0.05);
-    color: var(--secondary-color);
+    background: #f5f5f5;
 }
 
 .search-input-cantos {
     flex: 1;
     border: none;
-    padding: 10px 18px;
+    padding: 12px 15px;
     font-size: 0.95rem;
-    background: transparent;
+    background: white;
+    color: #333;
 }
 
 .search-input-cantos:focus {
@@ -189,86 +200,71 @@ body {
 }
 
 .search-input-cantos::placeholder {
-    color: rgba(102,102,102,0.6);
+    color: #999;
 }
 
 .search-btn-cantos {
-    background: linear-gradient(135deg, var(--secondary-color), var(--secondary-hover));
+    background: #e74c3c;
     border: none;
-    padding: 10px 20px;
+    padding: 12px 25px;
     cursor: pointer;
     color: white;
-    transition: all var(--transition-base);
-    position: relative;
-    overflow: hidden;
-}
-
-.search-btn-cantos::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.3);
-    transform: translate(-50%, -50%);
-    transition: width 0.6s, height 0.6s;
-}
-
-.search-btn-cantos:hover::before {
-    width: 300px;
-    height: 300px;
+    transition: background 0.2s;
 }
 
 .search-btn-cantos:hover {
-    transform: scale(1.05);
+    background: #d43f2f;
 }
 
 .search-icon-cantos {
-    font-size: 1rem;
-    position: relative;
-    z-index: 1;
+    font-size: 1.1rem;
 }
 
 .account-section {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 15px;
 }
 
 .account-btn, .account-dropdown-btn {
-    background: rgba(255,255,255,0.8);
-    border: 2px solid rgba(139,115,85,0.2);
-    padding: 8px 16px;
-    border-radius: 25px;
+    background: transparent;
+    border: none;
+    padding: 0;
     text-decoration: none;
-    color: var(--text-dark);
-    font-size: 0.9rem;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 6px;
+    color: #2c3e50;
     cursor: pointer;
-    transition: all var(--transition-base);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transition: all 0.2s;
 }
 
-.account-btn:hover, .account-dropdown-btn:hover {
-    background: white;
-    border-color: var(--secondary-color);
-    color: var(--secondary-color);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(74,144,226,0.2);
+.icon-circle {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.icon-circle svg {
+    color: #2c3e50;
+    transition: color 0.2s;
+}
+
+.account-btn:hover .icon-circle,
+.account-dropdown-btn:hover .icon-circle {
+    border-color: #e74c3c;
+}
+
+.account-btn:hover .icon-circle svg,
+.account-dropdown-btn:hover .icon-circle svg {
+    color: #e74c3c;
 }
 
 .account-btn-icon {
-    font-size: 1.1rem;
-    transition: transform var(--transition-fast);
-}
-
-.account-btn:hover .account-btn-icon {
-    transform: scale(1.15);
+    display: none;
 }
 
 .account-dropdown-wrapper {
@@ -316,110 +312,82 @@ body {
 }
 
 .cart-btn {
-    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
-    color: white;
+    background: transparent;
+    color: #2c3e50;
     border: none;
-    padding: 10px 20px;
-    border-radius: 25px;
+    padding: 0;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 10px;
-    font-size: 0.95rem;
-    font-weight: 600;
-    box-shadow: 0 4px 15px rgba(255,107,53,0.3);
-    transition: all var(--transition-base);
+    transition: color 0.2s;
     position: relative;
-    overflow: hidden;
 }
 
-.cart-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-    transition: left 0.5s;
+.cart-btn:hover .icon-circle {
+    border-color: #e74c3c;
 }
 
-.cart-btn:hover::before {
-    left: 100%;
-}
-
-.cart-btn:hover {
-    transform: translateY(-3px) scale(1.05);
-    box-shadow: 0 6px 25px rgba(255,107,53,0.4);
+.cart-btn:hover .icon-circle svg {
+    color: #e74c3c;
 }
 
 .cart-icon-cantos {
-    font-size: 1.2rem;
+    display: none;
 }
 
-.cart-btn:hover .cart-icon-cantos {
-    transform: rotate(-15deg) scale(1.1);
+.cart-count-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #e74c3c;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 600;
 }
 
+/* Old cart count styling - replaced by .cart-count-badge */
 .cart-count-cantos {
-    background: white;
-    color: var(--primary-color);
-    font-size: 0.75rem;
-    font-weight: 700;
-    padding: 3px 8px;
-    border-radius: 12px;
-    min-width: 22px;
-    text-align: center;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+    display: none;
 }
 
 /* ================================================
    3. NAVIGATION
    ================================================ */
 .nav-secondary-cantos {
-    background: linear-gradient(135deg, #8b7355 0%, #6d5a45 100%);
-    border-bottom: 3px solid rgba(255,107,53,0.5);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    background: white;
+    border-bottom: 1px solid #e0e0e0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
 .nav-secondary-content {
     max-width: 1400px;
     margin: 0 auto;
-    padding: 0 30px;
+    padding: 0 40px;
     display: flex;
-    gap: 5px;
+    gap: 0;
+    align-items: center;
 }
 
 .nav-link-cantos {
-    color: white;
+    color: #2c3e50;
     text-decoration: none;
-    padding: 14px 24px;
+    padding: 15px 20px;
     display: block;
     font-size: 0.95rem;
-    font-weight: 500;
-    transition: all var(--transition-base);
-    position: relative;
-}
-
-.nav-link-cantos::before {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    width: 0;
-    height: 3px;
-    background: var(--primary-color);
-    transform: translateX(-50%);
-    transition: width var(--transition-base);
-}
-
-.nav-link-cantos:hover::before {
-    width: 80%;
+    font-weight: 400;
+    transition: color 0.2s, background 0.2s;
+    white-space: nowrap;
 }
 
 .nav-link-cantos:hover {
-    background: rgba(255,255,255,0.15);
-    transform: translateY(-2px);
+    background: #f5f5f5;
+    color: #e74c3c;
 }
 
 /* ================================================
@@ -2013,4 +1981,709 @@ a.cta:hover, .register-link:hover {
 
 .home-page {
     background-color: #f5f5dc;
+}
+
+/* ================================================
+   13. ESTILO BERTRAND - BARRA SUPERIOR
+   ================================================ */
+.top-bar-cantos {
+    background: #e74c3c;
+    color: white;
+    padding: 10px 0;
+    font-size: 0.9rem;
+}
+
+.top-bar-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.top-bar-links {
+    display: flex;
+    align-items: center;
+    gap: 0;
+}
+
+.top-bar-link {
+    color: white;
+    text-decoration: none;
+    padding: 0 15px;
+    transition: opacity 0.2s;
+    font-weight: 400;
+}
+
+.top-bar-link:hover {
+    opacity: 0.9;
+}
+
+.top-bar-separator {
+    color: rgba(255,255,255,0.6);
+    font-weight: 300;
+}
+
+/* ================================================
+   14. NAVEGACIÓN MEJORADA
+   ================================================ */
+.menu-toggle-btn {
+    background: white;
+    border: 1px solid #ccc;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    color: #2c3e50;
+    transition: background 0.2s;
+    border-radius: 4px;
+    margin-right: 10px;
+}
+
+.menu-toggle-btn:hover {
+    background: #f5f5f5;
+}
+
+.menu-icon {
+    font-size: 1.3rem;
+    font-weight: bold;
+}
+
+/* ================================================
+   15. HERO BANNER NATAL ESTILO BERTRAND
+   ================================================ */
+.hero-banner-natal {
+    background: linear-gradient(135deg, #1a4d3a 0%, #2d5a4a 50%, #1a4d3a 100%);
+    color: white;
+    padding: 40px 20px;
+    margin-bottom: 40px;
+    position: relative;
+    overflow: hidden;
+    max-height: 380px;
+}
+
+.hero-banner-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+}
+
+.hero-text-section {
+    text-align: left;
+}
+
+.hero-dates {
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+    opacity: 0.9;
+}
+
+.hero-title {
+    font-size: 4rem;
+    font-weight: 900;
+    line-height: 1;
+    margin: 5px 0;
+    background: linear-gradient(180deg, #fff 0%, #f0f0f0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.hero-subtitle {
+    font-size: 1.6rem;
+    font-weight: 300;
+    margin-bottom: 10px;
+}
+
+.hero-highlight {
+    font-size: 2rem;
+    font-weight: 800;
+    margin: 15px 0;
+    letter-spacing: 2px;
+}
+
+.hero-buttons-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.hero-btn-novidades {
+    background: white;
+    color: var(--bertrand-green);
+    border: none;
+    padding: 10px 28px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s;
+    border-radius: 4px;
+}
+
+.hero-btn-novidades:hover {
+    background: var(--primary-color);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255,107,53,0.4);
+}
+
+.hero-conditions {
+    color: white;
+    text-decoration: underline;
+    font-size: 0.8rem;
+    opacity: 0.8;
+}
+
+.hero-conditions:hover {
+    opacity: 1;
+}
+
+.hero-image-section {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.hero-image {
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    object-fit: cover;
+}
+
+.hero-decorations {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.decoration-ball {
+    position: absolute;
+    top: 50px;
+    right: 100px;
+    width: 80px;
+    height: 80px;
+    background: radial-gradient(circle at 30% 30%, #e74c3c, #c0392b);
+    border-radius: 50%;
+    box-shadow: 0 10px 30px rgba(231,76,60,0.4);
+    animation: float 3s ease-in-out infinite;
+}
+
+.decoration-candy {
+    position: absolute;
+    bottom: 80px;
+    right: 150px;
+    width: 60px;
+    height: 100px;
+    background: linear-gradient(135deg, #e74c3c 0%, #e74c3c 50%, white 50%, white 100%);
+    border-radius: 30px;
+    box-shadow: 0 10px 30px rgba(231,76,60,0.3);
+    transform: rotate(15deg);
+    animation: float 4s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-20px) rotate(5deg);
+    }
+}
+
+/* Responsive Hero Banner */
+@media (max-width: 968px) {
+    .hero-banner-content {
+        grid-template-columns: 1fr;
+        gap: 30px;
+        text-align: center;
+    }
+    
+    .hero-text-section {
+        text-align: center;
+    }
+    
+    .hero-title {
+        font-size: 3.5rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.5rem;
+    }
+    
+    .hero-highlight {
+        font-size: 2rem;
+    }
+    
+    .decoration-ball,
+    .decoration-candy {
+        display: none;
+    }
+}
+
+@media (max-width: 640px) {
+    .hero-banner-natal {
+        padding: 40px 15px;
+    }
+    
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.2rem;
+    }
+    
+    .hero-highlight {
+        font-size: 1.5rem;
+    }
+    
+    .top-bar-links {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 4px;
+    }
+    
+    .top-bar-link {
+        padding: 0 8px;
+        font-size: 0.75rem;
+    }
+}
+
+/* ================================================
+   16. SECCIÓN NOVIDADES ESTILO BERTRAND
+   ================================================ */
+.novidades-section {
+    margin: 60px 0;
+    padding: 0 20px;
+}
+
+.novidades-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.novidades-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin: 0;
+}
+
+.ver-mais-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+    transition: all 0.2s;
+    padding: 8px 16px;
+    border-radius: 4px;
+}
+
+.ver-mais-link:hover {
+    background: rgba(255,107,53,0.1);
+    transform: translateX(4px);
+}
+
+/* Mejorar spacing de benefits */
+.benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+    margin: 40px 0 60px 0;
+    padding: 0 20px;
+}
+
+.benefit-card {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    transition: all 0.3s;
+}
+
+.benefit-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+}
+
+.benefit-card h3 {
+    font-size: 1.3rem;
+    margin-bottom: 12px;
+    color: var(--text-dark);
+}
+
+.benefit-card p {
+    color: var(--text-light);
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+.benefit-card a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+}
+
+.benefit-card a:hover {
+    color: var(--primary-hover);
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+    .novidades-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .novidades-title {
+        font-size: 1.5rem;
+    }
+    
+    .benefits-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ================================================
+   17. FOOTER MEJORADO
+   ================================================ */
+.footer-cantos {
+    background: linear-gradient(135deg, var(--bertrand-green) 0%, #1a4d3a 100%);
+    color: white;
+    padding: 50px 20px 20px 20px;
+    margin-top: 60px;
+}
+
+.footer-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 40px;
+    margin-bottom: 40px;
+}
+
+.footer-section h3 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    color: white;
+}
+
+.footer-section h4 {
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    color: white;
+    font-weight: 600;
+}
+
+.footer-section p {
+    color: rgba(255,255,255,0.8);
+    line-height: 1.6;
+    margin: 8px 0;
+}
+
+.footer-section a {
+    display: block;
+    color: rgba(255,255,255,0.8);
+    text-decoration: none;
+    margin: 8px 0;
+    transition: all 0.2s;
+    font-size: 0.95rem;
+}
+
+.footer-section a:hover {
+    color: white;
+    padding-left: 5px;
+}
+
+.footer-newsletter-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 6px;
+    background: rgba(255,255,255,0.1);
+    color: white;
+    margin-top: 10px;
+    font-size: 0.95rem;
+}
+
+.footer-newsletter-input::placeholder {
+    color: rgba(255,255,255,0.6);
+}
+
+.footer-newsletter-btn {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    background: var(--primary-color);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: all 0.3s;
+    font-size: 0.95rem;
+}
+
+.footer-newsletter-btn:hover {
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255,107,53,0.4);
+}
+
+.footer-bottom {
+    text-align: center;
+    padding-top: 30px;
+    border-top: 1px solid rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.7);
+    font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+    .footer-content {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+    
+    .footer-cantos {
+        padding: 40px 20px 20px 20px;
+    }
+}
+
+/* ================================================
+   18. MENÚ LATERAL BERTRAND
+   ================================================ */
+.menu-lateral-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 9998;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s;
+}
+
+.menu-lateral-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.menu-lateral {
+    position: fixed;
+    top: 0;
+    left: -380px;
+    width: 380px;
+    height: 100vh;
+    background: white;
+    z-index: 9999;
+    overflow-y: auto;
+    transition: left 0.3s;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+}
+
+.menu-lateral.active {
+    left: 0;
+}
+
+.menu-lateral-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #e0e0e0;
+    background: white;
+}
+
+.menu-lateral-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo-square-menu {
+    background: #e74c3c;
+    color: white;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    font-weight: 900;
+}
+
+.logo-text-menu {
+    display: flex;
+    flex-direction: column;
+}
+
+.logo-name-menu {
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: #2c3e50;
+    line-height: 1;
+}
+
+.logo-tagline-menu {
+    font-size: 0.65rem;
+    color: #e74c3c;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 600;
+}
+
+.menu-close-btn {
+    background: none;
+    border: none;
+    font-size: 2.5rem;
+    color: #666;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.menu-close-btn:hover {
+    color: #e74c3c;
+}
+
+.menu-tabs {
+    display: flex;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.menu-tab {
+    flex: 1;
+    padding: 15px;
+    background: #f5f5f5;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #666;
+    transition: all 0.2s;
+}
+
+.menu-tab.active {
+    background: white;
+    color: #e74c3c;
+    border-bottom-color: #e74c3c;
+}
+
+.menu-lateral-content {
+    background: white;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.menu-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    color: #2c3e50;
+    text-decoration: none;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background 0.2s;
+    font-size: 0.95rem;
+}
+
+.menu-item:hover {
+    background: #f9f9f9;
+}
+
+.menu-arrow {
+    color: #999;
+    font-size: 1.2rem;
+}
+
+.menu-item-destaque {
+    background: #e74c3c;
+    color: white;
+    font-weight: 600;
+}
+
+.menu-item-destaque:hover {
+    background: #d43f2f;
+}
+
+.menu-item-destaque .menu-arrow {
+    color: white;
+}
+
+.menu-item-gray {
+    background: #7a7a7a;
+    color: white;
+    font-weight: 600;
+}
+
+.menu-item-gray:hover {
+    background: #666;
+}
+
+.menu-item-gray .menu-arrow {
+    color: white;
+}
+
+.menu-item-dark {
+    background: #2c3e50;
+    color: white;
+    font-weight: 600;
+}
+
+.menu-item-dark:hover {
+    background: #1a252f;
+}
+
+.menu-item-dark .menu-arrow {
+    color: white;
+}
+
+.menu-info {
+    padding: 20px;
+    color: #666;
+    font-size: 0.95rem;
+}
 }

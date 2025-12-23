@@ -5,7 +5,30 @@
 {% block content %}
 <div class="home-page">
 <div class="main-container">
-  <div class="hero">
+  <!-- Hero Banner Natal Bertrand Style -->
+  <div class="hero-banner-natal">
+    <div class="hero-banner-content">
+      <div class="hero-text-section">
+        <div class="hero-dates">4 E 5 DEZEMBRO</div>
+        <h1 class="hero-title">20 a 50%</h1>
+        <div class="hero-subtitle">em cartão</div>
+        <div class="hero-highlight">+1000 LIVROS</div>
+        <div class="hero-buttons-wrapper">
+          <button class="hero-btn-novidades" onclick="window.location='/livros/?filtro=novidades'">INCLUI NOVIDADES</button>
+          <a href="#" class="hero-conditions">ver condições</a>
+        </div>
+      </div>
+      <div class="hero-image-section">
+        <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?w=600" alt="Promoção Natal" class="hero-image">
+      </div>
+      <div class="hero-decorations">
+        <div class="decoration-ball"></div>
+        <div class="decoration-candy"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero" style="display: none;">
     <div class="hero-carousel" style="height: 300px !important;">
       <!-- Slide 1 -->
       <div class="hero-slide active" style="background: url('https://picsum.photos/1920/300?random=1'); background-size: cover; background-position: center;">
@@ -96,15 +119,20 @@
     </div>
   </section>
 
-  {% if filtro == 'ofertas' %}
-      <h2 class="section-title">🎁 Livros em Oferta</h2>
-  {% elif filtro == 'mais-vendidos' %}
-      <h2 class="section-title">🔥 Mais Vendidos da Semana</h2>
-  {% elif filtro == 'novidades' %}
-      <h2 class="section-title">✨ Novidades 2025</h2>
-  {% else %}
-      <h2 class="section-title">📚 Livros em Destaque</h2>
-  {% endif %}
+  <!-- Sección de Novidades estilo Bertrand -->
+  <section class="novidades-section">
+    <div class="novidades-header">
+      {% if filtro == 'ofertas' %}
+          <h2 class="novidades-title">Livros em Oferta</h2>
+      {% elif filtro == 'mais-vendidos' %}
+          <h2 class="novidades-title">Mais Vendidos da Semana</h2>
+      {% elif filtro == 'novidades' %}
+          <h2 class="novidades-title">Novidades a não perder</h2>
+      {% else %}
+          <h2 class="novidades-title">Novidades a não perder</h2>
+      {% endif %}
+      <a href="/livros/" class="ver-mais-link">VER +</a>
+    </div>
 
   <div class="livros-grid">
       {% for info in livros_info %}
@@ -226,6 +254,7 @@
           </div>
       {% endfor %}
   </div>
+  </section>
   </div>
 </div>
 
