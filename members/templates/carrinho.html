@@ -22,7 +22,7 @@ function carregarCarrinho() {
                 <div class="carrinho-vazio">
                     <h2>🛒 O seu carrinho está vazio</h2>
                     <p>Adicione livros ao carrinho para começar as suas compras.</p>
-                    <a href="/" class="btn-continuar">Descobrir livros</a>
+                    <a href="{% url 'lista_livros' %}" class="btn-continuar">Descobrir livros</a>
                 </div>
             </div>
         `;
@@ -112,7 +112,7 @@ function carregarCarrinho() {
             <div class="resumo-iva">(com IVA incluído)</div>
             
             <button class="btn-finalizar" onclick="finalizarCompra()">Seguir para checkout →</button>
-            <button class="btn-ver-carrinho" onclick="window.location.href='/'">Continuar a descobrir</button>
+            <button class="btn-ver-carrinho" onclick="window.location.href='{% url 'lista_livros' %}'">Continuar a descobrir</button>
         </div>
     `;
     

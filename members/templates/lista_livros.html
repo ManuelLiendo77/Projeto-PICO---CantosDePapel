@@ -736,7 +736,7 @@
 <div class="catalogo-container">
   <!-- Breadcrumb -->
   <div class="catalogo-breadcrumb">
-    <a href="/">Início</a> › <span>Catálogo de Livros</span>
+    <a href="{% url 'pagina_principal' %}">Início</a> › <span>Catálogo de Livros</span>
     {% if filtros.categoria %}
       › <span>{{ filtros.categoria }}</span>
     {% endif %}
@@ -816,7 +816,7 @@
           <button type="submit" class="btn-aplicar-filtros">
             Aplicar Filtros
           </button>
-          <a href="/livros/" class="btn-limpar-filtros" style="display: block; text-align: center; text-decoration: none;">
+          <a href="{% url 'lista_livros' %}" class="btn-limpar-filtros" style="display: block; text-align: center; text-decoration: none;">
             Limpar Filtros
           </a>
         </form>
@@ -935,22 +935,25 @@
                           <span style="color: #666;">({{ item.livro.num_reviews }})</span>
                         </div>
                       {% endif %}
-                      
-                      {% if item.preco_min %}
-                        <div class="livro-preco">€{{ item.preco_min }}</div>
-                      {% else %}
-                        <div class="livro-preco" style="color: #999; font-size: 14px;">Consultar preço</div>
-                      {% endif %}
-                      
-                      <div class="livro-stock {% if not item.em_stock %}sem-stock{% endif %}">
-                        {% if item.em_stock %}
-                          ✓ Em stock
-                        {% else %}
-                          Sem stock
-                        {% endif %}
-                      </div>
                     </div>
                   </a>
+                  
+                  <!-- Preço e Stock acima do botão -->
+                  <div style="padding: 12px 15px; border-top: 2px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; margin-top: auto;">
+                    {% if item.preco_min %}
+                      <div class="livro-preco" style="margin: 0;">€{{ item.preco_min }}</div>
+                    {% else %}
+                      <div class="livro-preco" style="color: #999; font-size: 14px; margin: 0;">Consultar preço</div>
+                    {% endif %}
+                    
+                    <div class="livro-stock {% if not item.em_stock %}sem-stock{% endif %}" style="margin: 0;">
+                      {% if item.em_stock %}
+                        ✓ Em stock
+                      {% else %}
+                        Sem stock
+                      {% endif %}
+                    </div>
+                  </div>
                   
                   <!-- Botão Adicionar ao Carrinho -->
                   {% if item.em_stock and item.preco_min %}
@@ -1035,22 +1038,25 @@
                             <span style="color: #666;">({{ item.livro.num_reviews }})</span>
                           </div>
                         {% endif %}
-                        
-                        {% if item.preco_min %}
-                          <div class="livro-preco">€{{ item.preco_min }}</div>
-                        {% else %}
-                          <div class="livro-preco" style="color: #999; font-size: 14px;">Consultar preço</div>
-                        {% endif %}
-                        
-                        <div class="livro-stock {% if not item.em_stock %}sem-stock{% endif %}">
-                          {% if item.em_stock %}
-                            ✓ Em stock
-                          {% else %}
-                            Sem stock
-                          {% endif %}
-                        </div>
                       </div>
                     </a>
+                    
+                    <!-- Preço e Stock acima do botão -->
+                    <div style="padding: 12px 15px; border-top: 2px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; margin-top: auto;">
+                      {% if item.preco_min %}
+                        <div class="livro-preco" style="margin: 0;">€{{ item.preco_min }}</div>
+                      {% else %}
+                        <div class="livro-preco" style="color: #999; font-size: 14px; margin: 0;">Consultar preço</div>
+                      {% endif %}
+                      
+                      <div class="livro-stock {% if not item.em_stock %}sem-stock{% endif %}" style="margin: 0;">
+                        {% if item.em_stock %}
+                          ✓ Em stock
+                        {% else %}
+                          Sem stock
+                        {% endif %}
+                      </div>
+                    </div>
                     
                     <!-- Botão Adicionar ao Carrinho -->
                     {% if item.em_stock and item.preco_min %}

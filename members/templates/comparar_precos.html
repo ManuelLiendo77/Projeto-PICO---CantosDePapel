@@ -5,115 +5,129 @@
 {% block extra_css %}
 <style>
     .comparar-container {
-        background: #f5f7f9;
+        background: linear-gradient(135deg, #f5f7f9 0%, #e8ecef 100%);
         min-height: 100vh;
-        padding: 30px 0;
+        padding: 40px 0;
     }
     
     .comparar-content {
-        max-width: 900px;
+        max-width: 960px;
         margin: 0 auto;
         padding: 0 20px;
     }
     
     .comparar-header {
         background: white;
-        padding: 25px;
-        border-radius: 8px;
-        margin-bottom: 20px;
+        padding: 30px;
+        border-radius: 12px;
+        margin-bottom: 25px;
         display: flex;
         align-items: center;
-        gap: 20px;
+        gap: 25px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
     }
     
     .livro-mini-img {
-        width: 80px;
-        height: 120px;
+        width: 90px;
+        height: 135px;
         object-fit: cover;
-        border-radius: 4px;
+        border-radius: 6px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
     
     .comparar-titulo {
-        font-size: 20px;
-        font-weight: 600;
-        color: #333;
-        margin: 0 0 5px 0;
+        font-size: 22px;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin: 0 0 8px 0;
+        line-height: 1.3;
     }
     
     .comparar-subtitulo {
-        font-size: 14px;
+        font-size: 15px;
         color: #666;
+        font-weight: 500;
     }
     
     .precos-grid {
         display: grid;
-        gap: 15px;
+        gap: 18px;
     }
     
     .preco-card {
         background: white;
-        border: 2px solid #e0e0e0;
-        border-radius: 8px;
-        padding: 20px;
+        border: 2px solid #e8eaed;
+        border-radius: 12px;
+        padding: 25px;
         display: grid;
         grid-template-columns: 1fr auto auto;
         align-items: center;
-        gap: 20px;
-        transition: all 0.3s;
+        gap: 25px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
     
     .preco-card:hover {
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        transform: translateY(-4px);
+        border-color: #d0d0d0;
     }
     
     .preco-card.melhor-preco {
         border-color: #28a745;
-        background: linear-gradient(to right, #f0fff4, white);
+        background: linear-gradient(to right, #f0fff4, #ffffff);
         position: relative;
+        box-shadow: 0 4px 16px rgba(40, 167, 69, 0.2);
+    }
+    
+    .preco-card.melhor-preco:hover {
+        box-shadow: 0 8px 24px rgba(40, 167, 69, 0.3);
     }
     
     .badge-melhor {
         position: absolute;
-        top: -10px;
-        left: 20px;
-        background: #28a745;
+        top: -12px;
+        left: 25px;
+        background: linear-gradient(135deg, #28a745, #20c997);
         color: white;
-        padding: 4px 12px;
-        border-radius: 12px;
-        font-size: 11px;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 12px;
         font-weight: 700;
         text-transform: uppercase;
-        box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+        letter-spacing: 0.5px;
+        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
     }
     
     .loja-info-comparar {
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 15px;
     }
     
     .loja-icon {
-        width: 40px;
-        height: 40px;
-        background: #f0f0f0;
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 20px;
+        font-size: 24px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
     
     .loja-nome {
-        font-size: 16px;
+        font-size: 17px;
         font-weight: 600;
-        color: #333;
+        color: #2c2c2c;
     }
     
     .preco-valor-comparar {
-        font-size: 32px;
-        font-weight: 600;
+        font-size: 36px;
+        font-weight: 700;
         color: #B12704;
+        letter-spacing: -0.5px;
     }
     
     .preco-card.melhor-preco .preco-valor-comparar {
@@ -123,56 +137,95 @@
     .btn-ver-loja {
         background: linear-gradient(to bottom, #f7dfa5, #f0c14b);
         border: 1px solid #a88734;
-        border-radius: 6px;
-        padding: 10px 24px;
-        font-size: 14px;
+        border-radius: 8px;
+        padding: 12px 28px;
+        font-size: 15px;
         font-weight: 600;
         color: #111;
         text-decoration: none;
-        transition: all 0.2s;
+        transition: all 0.2s ease;
         white-space: nowrap;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     
     .btn-ver-loja:hover {
         background: linear-gradient(to bottom, #f5d78e, #edb933);
-        transform: translateY(-1px);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
     }
     
     .preco-card.melhor-preco .btn-ver-loja {
-        background: #28a745;
+        background: linear-gradient(135deg, #28a745, #20c997);
         border-color: #28a745;
         color: white;
     }
     
     .preco-card.melhor-preco .btn-ver-loja:hover {
-        background: #218838;
+        background: linear-gradient(135deg, #218838, #1ba87f);
         border-color: #218838;
     }
     
     .sem-precos {
         background: white;
         padding: 60px 20px;
-        border-radius: 8px;
+        border-radius: 12px;
         text-align: center;
         color: #999;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
     }
     
     .btn-voltar-comparar {
         display: inline-block;
         background: white;
-        border: 1px solid #d5d9d9;
+        border: 2px solid #d5d9d9;
         color: #333;
-        padding: 10px 20px;
-        border-radius: 6px;
+        padding: 12px 24px;
+        border-radius: 8px;
         text-decoration: none;
-        font-size: 14px;
-        margin-top: 20px;
-        transition: all 0.2s;
+        font-size: 15px;
+        font-weight: 600;
+        margin-top: 25px;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
     
     .btn-voltar-comparar:hover {
         background: #f7f8f8;
         border-color: #999;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .comparar-header {
+            flex-direction: column;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .livro-mini-img {
+            width: 70px;
+            height: 105px;
+        }
+        
+        .preco-card {
+            grid-template-columns: 1fr;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .loja-info-comparar {
+            justify-content: center;
+        }
+        
+        .preco-valor-comparar {
+            font-size: 30px;
+        }
+        
+        .btn-ver-loja {
+            width: 100%;
+        }
     }
 </style>
 {% endblock %}

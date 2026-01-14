@@ -287,6 +287,77 @@
         </div>
     </div>
 
+    <style>
+    /* Toast Notifications */
+    .toast-notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+        color: white;
+        padding: 16px 24px;
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(76, 175, 80, 0.4);
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 280px;
+        transform: translateX(400px);
+        opacity: 0;
+        transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        backdrop-filter: blur(10px);
+    }
+
+    .toast-notification.show {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    .toast-notification.hide {
+        transform: translateX(400px);
+        opacity: 0;
+        transition: all 0.3s ease-in;
+    }
+
+    .toast-icon {
+        background: rgba(255, 255, 255, 0.2);
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        font-weight: bold;
+        flex-shrink: 0;
+    }
+
+    .toast-message {
+        font-weight: 600;
+        font-size: 14px;
+        letter-spacing: 0.3px;
+    }
+
+    @media (max-width: 768px) {
+        .toast-notification {
+            top: 10px;
+            right: 10px;
+            left: 10px;
+            min-width: auto;
+            transform: translateY(-100px);
+        }
+
+        .toast-notification.show {
+            transform: translateY(0);
+        }
+
+        .toast-notification.hide {
+            transform: translateY(-100px);
+        }
+    }
+    </style>
+
     <script>
     // Sistema de carrinho global
     let carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
@@ -331,28 +402,59 @@
     mostrarNotificacao(MSG_ADICIONADO_CARRINHO);
     }
 
+    // Sistema de notificações melhorado
+    let notificacaoAtual = null;
+    let filaNotificacoes = [];
+
     function mostrarNotificacao(mensagem) {
+        // Se já existe uma notificação, adicionar à fila
+        if (notificacaoAtual) {
+            // Apenas adicionar à fila se não estiver já lá
+            if (!filaNotificacoes.includes(mensagem)) {
+                filaNotificacoes.push(mensagem);
+            }
+            return;
+        }
+
+        // Criar notificação
         const notif = document.createElement('div');
-        notif.textContent = mensagem;
-        notif.style.cssText = `
-            position: fixed;
-            top: 100px;
-            right: 20px;
-            background: #4caf50;
-            color: white;
-            padding: 15px 25px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            z-index: 10000;
-            font-weight: bold;
-            animation: slideIn 0.3s ease;
+        notif.className = 'toast-notification';
+        notif.innerHTML = `
+            <div class="toast-icon">✓</div>
+            <div class="toast-message">${mensagem}</div>
         `;
+        
         document.body.appendChild(notif);
+        notificacaoAtual = notif;
+        
+        // Forçar reflow para que a animação funcione
+        notif.offsetHeight;
+        
+        // Adicionar classe para animação de entrada
+        requestAnimationFrame(() => {
+            notif.classList.add('show');
+        });
+        
+        // Remover após 2.5 segundos
+        setTimeout(() => {
+            removerNotificacao(notif);
+        }, 2500);
+    }
+
+    function removerNotificacao(notif) {
+        notif.classList.remove('show');
+        notif.classList.add('hide');
         
         setTimeout(() => {
-            notif.style.animation = 'slideOut 0.3s ease';
-            setTimeout(() => notif.remove(), 300);
-        }, 2000);
+            notif.remove();
+            notificacaoAtual = null;
+            
+            // Mostrar próxima notificação da fila
+            if (filaNotificacoes.length > 0) {
+                const proximaMensagem = filaNotificacoes.shift();
+                mostrarNotificacao(proximaMensagem);
+            }
+        }, 300);
     }
 
     function abrirCarrinhoSidebar() {

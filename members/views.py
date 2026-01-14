@@ -70,6 +70,10 @@ from django.db.models import Q
 
 # Página principal tipo galeria com pesquisa
 def pagina_principal(request):
+  """
+  Vista principal da loja com pesquisa e filtros otimizada.
+  Usa prefetch_related para evitar consultas N+1 ao carregar preços e filmes.
+  """
   query = request.GET.get('q', '').strip()
   categoria = request.GET.get('categoria', '').strip()
   filtro = request.GET.get('filtro', '').strip()  # 'ofertas', 'mais-vendidos', 'novidades'
@@ -78,15 +82,19 @@ def pagina_principal(request):
   if not query and not categoria and not filtro:
     # Obter livros novidade ou mais vendidos, ordenados por data
     # distinct() garante que não haja duplicados
+    # Otimizado com prefetch_related para carregar preços de uma vez
     livros = Livro.objects.filter(
       Q(novidade=True) | Q(mais_vendido=True)
+    ).prefetch_related(
+      'preco_set__loja',
+      'reviews'
     ).distinct().order_by('-data_publicacao')[:10]
   
-  # Si hay búsqueda o filtros, mostrar resultados completos
+  # Se há pesquisa ou filtros, mostrar resultados completos
   else:
-    livros = Livro.objects.all()
+    livros = Livro.objects.prefetch_related('preco_set__loja', 'reviews').all()
     
-    # Aplicar filtros especiales
+    # Aplicar filtros especiais
     if filtro == 'ofertas':
       livros = livros.filter(em_oferta=True)
     elif filtro == 'mais-vendidos':
@@ -118,21 +126,26 @@ def pagina_principal(request):
       continue
     livros_ids_processados.add(livro.id)
     
-    # Usar métodos do modelo otimizados
-    preco_min = livro.obter_preco_minimo()
+    # Usar métodos otimizados do modelo
+    info_preco = livro.obter_preco_com_desconto()
     loja_min_obj = livro.obter_loja_preco_minimo()
     loja_min = loja_min_obj.nome if loja_min_obj else None
+    
+    preco_min = None
     preco_antigo = None
     
-    if preco_min:
-      # Calcular precio con descuento si está en oferta
-      if livro.em_oferta and livro.desconto_percentagem > 0:
-        preco_antigo = preco_min
-        preco_min = round(float(preco_min) * (1 - float(livro.desconto_percentagem) / 100), 2)
+    if info_preco:
+      preco_min = info_preco['preco_final']
+      if info_preco['tem_desconto']:
+        preco_antigo = info_preco['preco_original']
       else:
-        preco_antigo = round(float(preco_min) * 1.05, 2)
+        # Simular preço antigo ligeiramente maior
+        preco_antigo = round(info_preco['preco_original'] * 1.05, 2)
+    
+    import random
     estrelas = random.randint(3, 5)
     tipo_capa = random.choice(['Capa dura', 'Capa mole', 'Edição de bolso'])
+    
     livros_info.append({
       'livro': livro,
       'preco_min': preco_min,
@@ -156,8 +169,12 @@ def pagina_principal(request):
 
 # Lista de livros
 def lista_livros(request):
-  # Obter todos os livros inicialmente
-  livros = Livro.objects.all()
+  """
+  Vista de listagem de livros com filtros otimizada.
+  Usa prefetch_related para evitar consultas N+1 ao carregar preços.
+  """
+  # Obter todos os livros inicialmente com preços pré-carregados
+  livros = Livro.objects.prefetch_related('preco_set__loja').all()
   
   # Obter parâmetros de filtro
   categoria = request.GET.get('categoria', '')
@@ -186,7 +203,7 @@ def lista_livros(request):
   for livro in livros:
     preco_min_livro = livro.obter_preco_minimo()
     
-    # Aplicar filtro de precio
+    # Aplicar filtro de preço
     incluir = True
     if preco_min and preco_min_livro:
       try:
@@ -260,12 +277,20 @@ def lista_livros(request):
 
 # Página de detalhe do livro (estilo Amazon)
 def livro_detalhe(request, livro_id):
-  livro = get_object_or_404(Livro, id=livro_id)
+  """
+  Vista de detalhes do livro otimizada.
+  Usa select_related e prefetch_related para carregar dados relacionados.
+  """
+  # Carregar livro com preços e filme otimizados
+  livro = get_object_or_404(
+    Livro.objects.prefetch_related('preco_set__loja'),
+    id=livro_id
+  )
   
-  # Usar métodos do modelo para obter preços
-  preco_min = livro.obter_preco_minimo()
-  loja_min_obj = livro.obter_loja_preco_minimo()
-  loja_min = loja_min_obj.nome if loja_min_obj else None
+  # Usar métodos otimizados do modelo para obter preços
+  melhor_oferta = livro.obter_melhor_oferta()
+  preco_min = melhor_oferta['preco'] if melhor_oferta else None
+  loja_min = melhor_oferta['loja'].nome if melhor_oferta else None
   
   # Informações adicionais
   import random
@@ -294,9 +319,16 @@ def livro_detalhe(request, livro_id):
   
   # Obter informações do filme se existir
   filme = None
+  trailer_url_embebido = None
+  plataformas_streaming = []
+  
   if livro.tem_filme:
     try:
       filme = livro.filme
+      # Obter URL do trailer no formato embebido
+      trailer_url_embebido = filme.obter_url_trailer_embebido()
+      # Obter plataformas de streaming disponíveis
+      plataformas_streaming = filme.obter_plataformas_disponiveis()
     except Filme.DoesNotExist:
       filme = None
   
@@ -316,18 +348,27 @@ def livro_detalhe(request, livro_id):
     'review_utilizador': review_utilizador,
     'esta_nos_favoritos': esta_nos_favoritos,
     'filme': filme,
+    'trailer_url_embebido': trailer_url_embebido,
+    'plataformas_streaming': plataformas_streaming,
   }
   
   return render(request, 'livro_detalhe.html', context)
 
 # Comparar preços de um livro
 def comparar_precos(request, livro_id):
+  """
+  Vista de comparação de preços otimizada.
+  Usa o método do modelo para obter preços ordenados com select_related.
+  """
   livro = get_object_or_404(Livro, id=livro_id)
-  precos = Preco.objects.filter(livro=livro).select_related('loja').order_by('preco')
   
-  # Encontrar el precio más bajo
+  # Usar método otimizado do modelo que já inclui select_related
+  precos = livro.obter_comparacao_precos()
+  
+  # Obter melhor oferta (destaque 'Melhor Preço')
+  melhor_oferta = livro.obter_melhor_oferta()
   preco_mais_baixo = None
-  if precos.exists():
+  if melhor_oferta and precos.exists():
     preco_mais_baixo = precos.first()
   
   return render(request, 'comparar_precos.html', {
@@ -350,13 +391,22 @@ def carrinho(request):
   return render(request, 'carrinho.html')
 
 
-# Perfil del usuario con historial de pedidos
+# Perfil do utilizador com historial de pedidos
 @login_required
 def perfil_usuario(request):
-  # Obtener todos los pedidos del usuario ordenados por fecha más reciente
-  pedidos = Pedido.objects.filter(utilizador=request.user).order_by('-data_pedido')
+  """
+  Vista de perfil do utilizador otimizada.
+  Usa prefetch_related para carregar itens dos pedidos.
+  """
+  # Obter todos os pedidos do utilizador ordenados por data mais recente
+  # Otimizado com prefetch_related para carregar itens dos pedidos
+  pedidos = Pedido.objects.filter(
+    utilizador=request.user
+  ).prefetch_related(
+    'itens__livro'
+  ).order_by('-data_pedido')
   
-  # Calcular estadísticas
+  # Calcular estatísticas
   total_pedidos = pedidos.count()
   pedidos_entregues = pedidos.filter(status='entregue').count()
   pedidos_enviados = pedidos.filter(status='enviado').count()
@@ -371,10 +421,18 @@ def perfil_usuario(request):
   return render(request, 'perfil_usuario.html', context)
 
 
-# Detalle de un pedido específico
+# Detalhe de um pedido específico
 @login_required
 def pedido_detalhe(request, pedido_id):
-  pedido = get_object_or_404(Pedido, id=pedido_id, utilizador=request.user)
+  """
+  Vista de detalhes de um pedido otimizada.
+  Usa prefetch_related para carregar itens e livros do pedido.
+  """
+  pedido = get_object_or_404(
+    Pedido.objects.prefetch_related('itens__livro'),
+    id=pedido_id,
+    utilizador=request.user
+  )
   
   context = {
     'pedido': pedido,
@@ -382,11 +440,14 @@ def pedido_detalhe(request, pedido_id):
   return render(request, 'pedido_detalhe.html', context)
 
 
-# Checkout - Formulario de datos de envío
+# Checkout - Formulário de dados de envio
 @login_required
 def checkout(request):
-  # Obtener el carrito desde la sesión o localStorage (simulado)
-  # En producción, esto vendría del frontend via POST
+  """
+  Vista de checkout otimizada com validação de stock e aplicação de cupons.
+  """
+  # Obter o carrinho desde a sessão ou localStorage (simulado)
+  # Em produção, isto viria do frontend via POST
   
   if request.method == 'POST':
     form = CheckoutForm(request.POST)
@@ -459,7 +520,7 @@ def checkout(request):
         except Cupom.DoesNotExist:
           cupom_obj = None
       
-      # Criar o pedido
+    # Criar o pedido
       pedido = Pedido.objects.create(
         utilizador=request.user,
         status='pendente',
@@ -478,7 +539,7 @@ def checkout(request):
         notas=form.cleaned_data.get('notas', '')
       )
       
-      # Criar registro de uso do cupom se aplicado
+      # Criar registo de uso do cupom se aplicado
       if cupom_obj and desconto_cupom > 0:
         UsoCupom.objects.create(
           cupom=cupom_obj,
@@ -488,7 +549,7 @@ def checkout(request):
         )
 
       
-  # Criar os itens do pedido e descontar stock
+      # Criar os itens do pedido e descontar stock
       for item_data in items_pedido:
         ItemPedido.objects.create(
           pedido=pedido,
@@ -501,8 +562,8 @@ def checkout(request):
         item_data['livro'].stock -= item_data['quantidade']
         item_data['livro'].save()
       
-  # Guardar método de pagamento nas notas (temporário)
-      metodo_pago = form.cleaned_data['metodo_pago']
+      # Guardar método de pagamento nas notas (se fornecido)
+      metodo_pago = form.cleaned_data.get('metodo_pago')
       if metodo_pago:
         pedido.notas += _("\n\nMétodo de pagamento: {metodo}").format(
           metodo=dict(form.fields['metodo_pago'].choices)[metodo_pago]
@@ -542,10 +603,218 @@ def checkout(request):
   return render(request, 'checkout.html', context)
 
 
+# Processar Pagamento PayPal
+@login_required
+def processar_pagamento_paypal(request):
+  """
+  Vista para processar pagamento via PayPal.
+  Valida o pagamento, cria o pedido, reduz stock e envia confirmação.
+  """
+  if request.method != 'POST':
+    return JsonResponse({'success': False, 'mensagem': 'Método não permitido'}, status=405)
+  
+  try:
+    # Obter dados do PayPal
+    paypal_order_id = request.POST.get('paypal_order_id')
+    paypal_payer_id = request.POST.get('paypal_payer_id')
+    paypal_payer_email = request.POST.get('paypal_payer_email')
+    paypal_status = request.POST.get('paypal_status')
+    paypal_amount = request.POST.get('paypal_amount')
+    
+    # Validar dados obrigatórios
+    if not all([paypal_order_id, paypal_status, paypal_amount]):
+      return JsonResponse({
+        'success': False, 
+        'mensagem': 'Dados de pagamento incompletos'
+      }, status=400)
+    
+    # Verificar se o pagamento foi aprovado
+    if paypal_status != 'COMPLETED':
+      return JsonResponse({
+        'success': False,
+        'mensagem': f'Pagamento não concluído. Status: {paypal_status}'
+      }, status=400)
+    
+    # Obter dados do carrinho
+    carrinho_data = request.POST.get('carrinho_data')
+    if not carrinho_data:
+      return JsonResponse({'success': False, 'mensagem': 'Carrinho vazio'}, status=400)
+    
+    try:
+      carrinho = json.loads(carrinho_data)
+    except json.JSONDecodeError:
+      return JsonResponse({'success': False, 'mensagem': 'Erro ao processar carrinho'}, status=400)
+    
+    if not carrinho:
+      return JsonResponse({'success': False, 'mensagem': 'Carrinho vazio'}, status=400)
+    
+    # Obter dados do formulário
+    nome_completo = request.POST.get('nome_completo', '').strip()
+    email = request.POST.get('email', '').strip()
+    telefone = request.POST.get('telefone', '').strip()
+    morada = request.POST.get('morada', '').strip()
+    cidade = request.POST.get('cidade', '').strip()
+    codigo_postal = request.POST.get('codigo_postal', '').strip()
+    pais = request.POST.get('pais', 'Portugal')
+    notas = request.POST.get('notas', '')
+    
+    # Validar campos obrigatórios
+    if not all([nome_completo, email, telefone, morada, cidade, codigo_postal]):
+      return JsonResponse({
+        'success': False,
+        'mensagem': 'Todos os campos de envio são obrigatórios'
+      }, status=400)
+    
+    # Processar itens e calcular totais
+    items_pedido = []
+    subtotal = Decimal('0.00')
+    
+    for item in carrinho:
+      try:
+        livro = Livro.objects.get(id=item['id'])
+        quantidade = int(item['quantidade'])
+        
+        # Verificar stock disponível
+        if not livro.em_stock() or livro.stock < quantidade:
+          return JsonResponse({
+            'success': False,
+            'mensagem': f'Stock insuficiente para: {livro.titulo}'
+          }, status=400)
+        
+        preco_unitario = Decimal(str(item['preco']))
+        item_subtotal = preco_unitario * quantidade
+        subtotal += item_subtotal
+        
+        items_pedido.append({
+          'livro': livro,
+          'quantidade': quantidade,
+          'preco_unitario': preco_unitario,
+          'subtotal': item_subtotal
+        })
+        
+      except Livro.DoesNotExist:
+        return JsonResponse({
+          'success': False,
+          'mensagem': f'Livro não encontrado: ID {item["id"]}'
+        }, status=404)
+      except (ValueError, KeyError) as e:
+        return JsonResponse({
+          'success': False,
+          'mensagem': f'Erro nos dados do carrinho: {str(e)}'
+        }, status=400)
+    
+    # Calcular IVA e total
+    iva = subtotal * Decimal('0.23')
+    total = subtotal + iva
+    
+    # Aplicar cupom se fornecido
+    cupom_codigo = request.POST.get('cupom_codigo', '').strip().upper()
+    cupom_obj = None
+    desconto_cupom = Decimal('0.00')
+    
+    if cupom_codigo:
+      try:
+        cupom_obj = Cupom.objects.get(codigo=cupom_codigo)
+        
+        if cupom_obj.esta_valido():
+          pode_usar, mensagem = cupom_obj.pode_usar_utilizador(request.user)
+          
+          if pode_usar and subtotal >= cupom_obj.valor_minimo_pedido:
+            desconto_cupom = cupom_obj.calcular_desconto(subtotal)
+            total -= desconto_cupom
+            
+            # Incrementar contador de usos
+            cupom_obj.vezes_usado += 1
+            cupom_obj.save()
+          else:
+            cupom_obj = None
+      except Cupom.DoesNotExist:
+        pass  # Ignorar cupom inválido
+    
+    # VALIDAÇÃO CRÍTICA: Verificar se o valor pago coincide com o total calculado
+    paypal_amount_decimal = Decimal(paypal_amount)
+    if abs(paypal_amount_decimal - total) > Decimal('0.01'):  # Tolerância de 1 cêntimo
+      return JsonResponse({
+        'success': False,
+        'mensagem': f'O valor pago ({paypal_amount_decimal}€) não coincide com o total do pedido ({total}€). Possível manipulação de preços detectada.'
+      }, status=400)
+    
+    # Criar o pedido
+    pedido = Pedido.objects.create(
+      utilizador=request.user,
+      status='processando',  # Status inicial após pagamento confirmado
+      subtotal=subtotal,
+      iva=iva,
+      total=total,
+      cupom=cupom_obj,
+      desconto_cupom=desconto_cupom,
+      nome_completo=nome_completo,
+      email=email,
+      telefone=telefone,
+      morada=morada,
+      cidade=cidade,
+      codigo_postal=codigo_postal,
+      pais=pais,
+      notas=f"{notas}\n\nPagamento PayPal\nID Transação: {paypal_order_id}\nPayer ID: {paypal_payer_id}\nEmail: {paypal_payer_email}"
+    )
+    
+    # Criar registo de uso do cupom se aplicado
+    if cupom_obj and desconto_cupom > 0:
+      UsoCupom.objects.create(
+        cupom=cupom_obj,
+        utilizador=request.user,
+        pedido=pedido,
+        valor_desconto=desconto_cupom
+      )
+    
+    # Criar os itens do pedido e reduzir stock
+    for item_data in items_pedido:
+      ItemPedido.objects.create(
+        pedido=pedido,
+        livro=item_data['livro'],
+        quantidade=item_data['quantidade'],
+        preco_unitario=item_data['preco_unitario']
+      )
+      
+      # Reduzir stock e incrementar vendas
+      item_data['livro'].stock -= item_data['quantidade']
+      item_data['livro'].vendas_totais += item_data['quantidade']
+      item_data['livro'].save()
+    
+    # Enviar email de confirmação
+    try:
+      enviar_email_confirmacao_pedido(pedido)
+    except Exception as e:
+      print(f"Erro ao enviar email de confirmação: {e}")
+      # Não falhar o pedido se o email falhar
+    
+    # Retornar sucesso
+    return JsonResponse({
+      'success': True,
+      'mensagem': 'Pedido criado com sucesso',
+      'pedido_id': pedido.id
+    })
+    
+  except Exception as e:
+    print(f"Erro ao processar pagamento PayPal: {e}")
+    return JsonResponse({
+      'success': False,
+      'mensagem': f'Erro interno ao processar pagamento: {str(e)}'
+    }, status=500)
+
+
 # Confirmação do pedido
 @login_required
 def pedido_confirmado(request, pedido_id):
-  pedido = get_object_or_404(Pedido, id=pedido_id, utilizador=request.user)
+  """
+  Vista de confirmação de pedido otimizada.
+  Carrega itens do pedido com prefetch_related.
+  """
+  pedido = get_object_or_404(
+    Pedido.objects.prefetch_related('itens__livro'),
+    id=pedido_id,
+    utilizador=request.user
+  )
   
   context = {
     'pedido': pedido,
@@ -556,17 +825,17 @@ def pedido_confirmado(request, pedido_id):
 # ==================== PÁGINAS LEGALES ====================
 
 def politica_privacidad(request):
-  """Página de política de privacidad"""
+  """Página de política de privacidade."""
   return render(request, 'politica_privacidad.html')
 
 
 def terminos_condiciones(request):
-  """Página de términos y condiciones"""
+  """Página de termos e condições."""
   return render(request, 'terminos_condiciones.html')
 
 
 def politica_cookies(request):
-  """Página de política de cookies"""
+  """Página de política de cookies."""
   return render(request, 'politica_cookies.html')
 
 
@@ -574,7 +843,7 @@ def politica_cookies(request):
 
 @login_required
 def submeter_review(request, livro_id):
-  """Submeter uma avaliação para um livro"""
+  """Submeter uma avaliação para um livro."""
   livro = get_object_or_404(Livro, id=livro_id)
   
   # Verificar se o utilizador já avaliou este livro
@@ -612,7 +881,7 @@ def submeter_review(request, livro_id):
 
 @login_required
 def editar_review(request, review_id):
-  """Editar uma avaliação existente"""
+  """Editar uma avaliação existente."""
   review = get_object_or_404(Review, id=review_id, utilizador=request.user)
   
   if request.method == 'POST':
@@ -634,7 +903,7 @@ def editar_review(request, review_id):
 
 @login_required
 def remover_review(request, review_id):
-  """Remover uma avaliação"""
+  """Remover uma avaliação."""
   review = get_object_or_404(Review, id=review_id, utilizador=request.user)
   livro_id = review.livro.id
   
@@ -650,7 +919,7 @@ def remover_review(request, review_id):
 
 @login_required
 def adicionar_favorito(request, livro_id):
-  """Adicionar um livro aos favoritos"""
+  """Adicionar um livro aos favoritos."""
   livro = get_object_or_404(Livro, id=livro_id)
   
   # Verificar se já está nos favoritos
@@ -671,7 +940,7 @@ def adicionar_favorito(request, livro_id):
 
 @login_required
 def remover_favorito(request, livro_id):
-  """Remover um livro dos favoritos"""
+  """Remover um livro dos favoritos."""
   livro = get_object_or_404(Livro, id=livro_id)
   
   try:
@@ -690,7 +959,10 @@ def remover_favorito(request, livro_id):
 
 @login_required
 def toggle_favorito(request, livro_id):
-  """Toggle favorito via AJAX - adiciona ou remove"""
+  """
+  Toggle favorito via AJAX - adiciona ou remove.
+  Retorna resposta JSON indicando o estado atual.
+  """
   from django.http import JsonResponse
   
   if request.method != 'POST':
@@ -719,16 +991,18 @@ def toggle_favorito(request, livro_id):
 
 @login_required
 def lista_favoritos(request):
-  """Exibir a lista de favoritos do utilizador"""
-  favoritos = Favorito.objects.filter(utilizador=request.user).select_related('livro')
+  """
+  Exibir a lista de favoritos do utilizador otimizada.
+  Usa select_related para carregar livros e prefetch_related para preços.
+  """
+  favoritos = Favorito.objects.filter(
+    utilizador=request.user
+  ).select_related('livro').prefetch_related('livro__preco_set__loja')
   
   # Para cada favorito, obter o preço mínimo do livro
   favoritos_com_preco = []
   for favorito in favoritos:
-    precos = Preco.objects.filter(livro=favorito.livro)
-    preco_min = None
-    if precos.exists():
-      preco_min = min(precos, key=lambda p: p.preco).preco
+    preco_min = favorito.livro.obter_preco_minimo()
     
     favoritos_com_preco.append({
       'favorito': favorito,
@@ -745,7 +1019,10 @@ def lista_favoritos(request):
 
 @login_required
 def validar_cupom(request):
-  """Valida um cupom de desconto via AJAX"""
+  """
+  Valida um cupom de desconto via AJAX.
+  Verifica validade, utilizações e calcula desconto.
+  """
   if request.method != 'POST':
     return JsonResponse({'valido': False, 'erro': 'Método não permitido'})
   

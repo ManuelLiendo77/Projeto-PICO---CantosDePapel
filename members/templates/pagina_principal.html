@@ -36,7 +36,7 @@
           <h1 style="font-size: 1.6rem !important; margin-bottom: 8px !important;">📚 Descubra Novos Mundos</h1>
           <p style="font-size: 1.05rem !important; margin-bottom: 14px !important;">Cada livro é uma porta para outra vida. Receba os seus favoritos em 48h para todo o país.</p>
           <div class="hero-cta-wrapper" style="gap: 14px !important;">
-            <a href="/livros/" class="hero-btn" style="padding: 10px 22px !important; font-size: 1.05rem !important; background: linear-gradient(135deg, #ff6b35, #ff8c42) !important;">Explorar catálogo completo</a>
+            <a href="{% url 'lista_livros' %}" class="hero-btn" style="padding: 10px 22px !important; font-size: 1.05rem !important; background: linear-gradient(135deg, #ff6b35, #ff8c42) !important;">Explorar catálogo completo</a>
             <a href="/?filtro=novidades" class="hero-btn outline" style="padding: 10px 22px !important; font-size: 1.05rem !important; background: rgba(255,255,255,0.25) !important; border: 2px solid white !important; backdrop-filter: blur(5px) !important;">Ver novidades</a>
           </div>
         </div>
@@ -131,7 +131,7 @@
       {% else %}
           <h2 class="novidades-title">Novidades a não perder</h2>
       {% endif %}
-      <a href="/livros/" class="ver-mais-link">VER +</a>
+      <a href="{% url 'lista_livros' %}" class="ver-mais-link">VER +</a>
     </div>
 
   <div class="livros-grid">
@@ -201,27 +201,26 @@
             </li>
           </ul>
 
-          <div class="livro-card__price-row">
-            <div class="livro-card__price">
-              {% if info.preco_min %}
-                {% if info.preco_antigo and info.livro.em_oferta %}
-                  <span class="livro-preco-antigo">€{{ info.preco_antigo }}</span>
-                {% endif %}
-                <span class="livro-preco-atual">€{{ info.preco_min }}</span>
-              {% else %}
-                <span class="livro-preco-consultar">Consultar preço</span>
-              {% endif %}
-            </div>
-            <div class="livro-card__stock-tag {% if info.em_stock %}em-stock{% else %}sem-stock{% endif %}">
-              {% if info.em_stock %}
-                ✓ Em stock
-              {% else %}
-                ✗ Esgotado
-              {% endif %}
-            </div>
-          </div>
-
           <div class="livro-card__actions">
+            <div class="livro-card__price-row">
+              <div class="livro-card__price">
+                {% if info.preco_min %}
+                  {% if info.preco_antigo and info.livro.em_oferta %}
+                    <span class="livro-preco-antigo">€{{ info.preco_antigo }}</span>
+                  {% endif %}
+                  <span class="livro-preco-atual">€{{ info.preco_min }}</span>
+                {% else %}
+                  <span class="livro-preco-consultar">Consultar preço</span>
+                {% endif %}
+              </div>
+              <div class="livro-card__stock-tag {% if info.em_stock %}em-stock{% else %}sem-stock{% endif %}">
+                {% if info.em_stock %}
+                  ✓ Em stock
+                {% else %}
+                  ✗ Esgotado
+                {% endif %}
+              </div>
+            </div>
             <button class="btn-adicionar-carrinho"
                 aria-label="Adicionar {{ info.livro.titulo }} ao carrinho"
                 data-livro-id="{{ info.livro.id }}"

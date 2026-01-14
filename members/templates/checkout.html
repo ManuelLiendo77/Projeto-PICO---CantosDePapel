@@ -15,7 +15,7 @@
         </div>
     </div>
 
-    <form method="post" id="checkout-form" class="checkout-form">
+    <form method="post" id="checkout-form" class="checkout-form" onsubmit="return false;">
         {% csrf_token %}
         <input type="hidden" name="carrinho_data" id="carrinho_data">
         
@@ -99,33 +99,9 @@
                 </div>
 
                 <div class="form-section">
-                    <h2>💳 Método de pagamento</h2>
-                    
-                    <div class="payment-methods">
-                        {% for choice in form.metodo_pago %}
-                            <label class="payment-method">
-                                {{ choice.tag }}
-                                <span class="payment-label">
-                                    {% if choice.data.value == 'mbway' %}
-                                        📱 {{ choice.choice_label }}
-                                    {% elif choice.data.value == 'multibanco' %}
-                                        🏦 {{ choice.choice_label }}
-                                    {% elif choice.data.value == 'cartao' %}
-                                        💳 {{ choice.choice_label }}
-                                    {% endif %}
-                                </span>
-                            </label>
-                        {% endfor %}
-                    </div>
-                    {% if form.metodo_pago.errors %}
-                        <span class="error">{{ form.metodo_pago.errors.0 }}</span>
-                    {% endif %}
-                </div>
-
-                <div class="form-section">
                     <label class="checkbox-label">
                         {{ form.aceitar_termos }}
-                        <span>{{ form.aceitar_termos.label }} <a href="#" target="_blank">Ver termos</a></span>
+                        <span>{{ form.aceitar_termos.label }} <a href="{% url 'terminos_condiciones' %}" target="_blank" onclick="event.stopPropagation();">Ver termos</a></span>
                     </label>
                     {% if form.aceitar_termos.errors %}
                         <span class="error">{{ form.aceitar_termos.errors.0 }}</span>
@@ -183,11 +159,30 @@
                         </div>
                     </div>
                     
-                    <button type="submit" class="btn-finalizar">
-                        ✓ Confirmar e pagar
+                    <!-- Botão Comprar Agora -->
+                    <button type="button" class="btn-comprar-agora" id="btn-comprar">
+                        🛒 Comprar agora
                     </button>
                     
-                    <a href="/carrinho/" class="btn-volver">← Rever carrinho</a>
+                    <!-- Container para o botão PayPal (oculto até validação) -->
+                    <div id="paypal-button-container" style="display: none; margin-top: 15px;"></div>
+                    
+                    <!-- Mensagem de processamento -->
+                    <div id="payment-processing" style="display: none; text-align: center; padding: 20px; background: #e8f5e9; border-radius: 8px; margin-top: 15px;">
+                        <div class="spinner"></div>
+                        <p style="margin-top: 15px; color: #2e7d32; font-weight: 600;">A processar pagamento...</p>
+                    </div>
+                    
+                    <!-- Mensagens de erro -->
+                    <div id="payment-error" style="display: none; margin-top: 15px;" class="alert alert-error"></div>
+                    
+                    <div class="payment-notice">
+                        <p style="font-size: 13px; color: #666; margin: 15px 0; text-align: center;">
+                            🔒 Pagamento seguro via PayPal | Envio grátis
+                        </p>
+                    </div>
+                    
+                    <a href="{% url 'carrinho' %}" class="btn-volver">← Rever carrinho</a>
                 </div>
             </div>
         </div>
@@ -196,7 +191,7 @@
 
 <style>
 .checkout-container {
-    max-width: 1400px;
+    max-width: 1200px;
     margin: 0 auto;
     padding: 30px 20px;
 }
@@ -329,17 +324,71 @@
     color: #333;
 }
 
+.payment-info-box {
+    background: linear-gradient(135deg, #f8f9ff 0%, #e8ecff 100%);
+    padding: 20px;
+    border-radius: 8px;
+    border: 2px solid #667eea;
+    margin-top: 15px;
+}
+
+.payment-notice {
+    background: #fff8e1;
+    padding: 12px;
+    border-radius: 6px;
+    border-left: 4px solid #ffc107;
+    margin-top: 15px;
+}
+
+#paypal-button-container {
+    min-height: 50px;
+}
+
+.spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #667eea;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+#payment-processing {
+    background: #e8f5e9;
+    padding: 20px;
+    border-radius: 8px;
+    border: 2px solid #4caf50;
+}
+
+#payment-error {
+    margin-top: 15px;
+}
+
 .checkbox-label {
     display: flex;
     align-items: center;
     gap: 10px;
     cursor: pointer;
+    padding: 10px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.checkbox-label:hover {
+    background: #f5f5f5;
 }
 
 .checkbox-label input[type="checkbox"] {
     width: 20px;
     height: 20px;
     cursor: pointer;
+    accent-color: #667eea;
 }
 
 .error {
@@ -347,6 +396,7 @@
     font-size: 14px;
     margin-top: 5px;
     display: block;
+    font-weight: 600;
 }
 
 .alert {
@@ -564,24 +614,38 @@
     font-weight: 600;
 }
 
-
-.btn-finalizar {
+/* Botón Comprar Agora - Estilo Amazon */
+.btn-comprar-agora {
     width: 100%;
-    padding: 15px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border: none;
+    padding: 16px 24px;
+    background: linear-gradient(180deg, #f7b84b 0%, #f0a500 100%);
+    color: #111;
+    border: 1px solid #d69e31;
     border-radius: 8px;
     font-size: 18px;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
     margin-top: 20px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
 }
 
-.btn-finalizar:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+.btn-comprar-agora:hover {
+    background: linear-gradient(180deg, #f0a500 0%, #e89800 100%);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    transform: translateY(-1px);
+}
+
+.btn-comprar-agora:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+
+.btn-comprar-agora:disabled {
+    background: #ccc;
+    color: #666;
+    cursor: not-allowed;
+    border-color: #999;
 }
 
 .btn-volver {
@@ -622,6 +686,14 @@ document.addEventListener('DOMContentLoaded', function() {
         window.location.href = '/carrinho/';
         return;
     }
+    
+    // Prevenir submit del formulario
+    const checkoutForm = document.getElementById('checkout-form');
+    checkoutForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+    });
     
     // Guardar dados do carrinho no campo oculto
     document.getElementById('carrinho_data').value = JSON.stringify(carrinho);
@@ -671,6 +743,56 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Atualizar totais iniciais
     atualizarTotais();
+    
+    // ===== GUARDAR Y RECUPERAR DATOS DEL FORMULARIO =====
+    const form = document.getElementById('checkout-form');
+    const camposFormulario = [
+        'id_nome_completo',
+        'id_email', 
+        'id_telefone',
+        'id_morada',
+        'id_cidade',
+        'id_codigo_postal',
+        'id_pais',
+        'id_notas',
+        'id_aceitar_termos'
+    ];
+    
+    // Recuperar datos guardados al cargar la página
+    camposFormulario.forEach(campoId => {
+        const campo = document.getElementById(campoId);
+        if (!campo) return;
+        
+        const valorGuardado = localStorage.getItem('checkout_' + campoId);
+        if (valorGuardado) {
+            if (campo.type === 'checkbox') {
+                campo.checked = valorGuardado === 'true';
+            } else {
+                campo.value = valorGuardado;
+            }
+        }
+    });
+    
+    // Guardar datos mientras el usuario escribe
+    camposFormulario.forEach(campoId => {
+        const campo = document.getElementById(campoId);
+        if (!campo) return;
+        
+        campo.addEventListener('input', function() {
+            if (this.type === 'checkbox') {
+                localStorage.setItem('checkout_' + campoId, this.checked);
+            } else {
+                localStorage.setItem('checkout_' + campoId, this.value);
+            }
+        });
+        
+        // Para checkbox también escuchar el evento change
+        if (campo.type === 'checkbox') {
+            campo.addEventListener('change', function() {
+                localStorage.setItem('checkout_' + campoId, this.checked);
+            });
+        }
+    });
     
     // Aplicar cupom
     document.getElementById('btn-aplicar-cupom').addEventListener('click', function() {
@@ -750,6 +872,311 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('btn-aplicar-cupom').click();
         }
     });
+    
+    // Listener para el checkbox de términos
+    const aceitarTermosCheckbox = document.querySelector('#id_aceitar_termos');
+    if (aceitarTermosCheckbox) {
+        aceitarTermosCheckbox.addEventListener('change', function() {
+            const checkboxLabel = this.closest('.checkbox-label');
+            if (checkboxLabel) {
+                if (this.checked) {
+                    checkboxLabel.style.outline = 'none';
+                } else {
+                    checkboxLabel.style.outline = '2px solid #f44336';
+                    checkboxLabel.style.borderRadius = '4px';
+                }
+            }
+        });
+    }
+    
+    // Listeners para remover bordes rojos al escribir en campos
+    const formCheckout = document.getElementById('checkout-form');
+    if (formCheckout) {
+        const campos = formCheckout.querySelectorAll('.form-input, .form-textarea');
+        campos.forEach(campo => {
+            campo.addEventListener('input', function() {
+                if (this.value.trim()) {
+                    this.style.borderColor = '#e0e0e0';
+                }
+            });
+        });
+    }
+    
+    // ===== VALIDACIÓN DEL FORMULARIO =====
+    function validarFormulario() {
+        const form = document.getElementById('checkout-form');
+        const campos = {
+            nome_completo: form.querySelector('#id_nome_completo'),
+            email: form.querySelector('#id_email'),
+            telefone: form.querySelector('#id_telefone'),
+            morada: form.querySelector('#id_morada'),
+            cidade: form.querySelector('#id_cidade'),
+            codigo_postal: form.querySelector('#id_codigo_postal'),
+        };
+        
+        const erros = [];
+        let primerError = null;
+        
+        // Validar campos de texto
+        for (const [nombre, campo] of Object.entries(campos)) {
+            if (!campo || !campo.value.trim()) {
+                erros.push(`Campo obrigatório: ${nombre.replace(/_/g, ' ')}`);
+                campo.style.borderColor = '#f44336';
+                if (!primerError) primerError = campo;
+            } else {
+                campo.style.borderColor = '#e0e0e0';
+            }
+        }
+        
+        // Validar email
+        if (campos.email && campos.email.value) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(campos.email.value)) {
+                erros.push('Email inválido');
+                campos.email.style.borderColor = '#f44336';
+                if (!primerError) primerError = campos.email;
+            }
+        }
+        
+        // Validar checkbox de términos
+        const aceitarTermos = form.querySelector('#id_aceitar_termos');
+        const checkboxLabel = aceitarTermos ? aceitarTermos.closest('.checkbox-label') : null;
+        
+        if (aceitarTermos && !aceitarTermos.checked) {
+            erros.push('Deve aceitar os termos e condições para continuar');
+            if (checkboxLabel) {
+                checkboxLabel.style.outline = '2px solid #f44336';
+                checkboxLabel.style.borderRadius = '4px';
+                checkboxLabel.style.padding = '10px';
+            }
+            if (!primerError) primerError = aceitarTermos;
+        } else if (checkboxLabel) {
+            checkboxLabel.style.outline = 'none';
+        }
+        
+        // Mostrar errores si los hay
+        const errorDiv = document.getElementById('payment-error');
+        if (erros.length > 0) {
+            errorDiv.style.display = 'block';
+            errorDiv.innerHTML = '<strong style="font-size: 16px;">⚠️ Por favor, corrija os seguintes erros:</strong><br><br>' + 
+                                 erros.map(e => '• ' + e).join('<br>');
+            
+            if (primerError) {
+                primerError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            return false;
+        }
+        
+        errorDiv.style.display = 'none';
+        return true;
+    }
+    
+    // ===== BOTÓN COMPRAR AGORA =====
+    const btnComprar = document.getElementById('btn-comprar');
+    let paypalCargado = false;
+    
+    btnComprar.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Validar formulario
+        if (!validarFormulario()) {
+            return;
+        }
+        
+        // Si ya se cargó PayPal, simplemente mostrarlo
+        if (paypalCargado) {
+            document.getElementById('paypal-button-container').style.display = 'block';
+            document.getElementById('paypal-button-container').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            btnComprar.textContent = '⬇️ Pague con PayPal abaixo';
+            btnComprar.style.background = 'linear-gradient(180deg, #667eea 0%, #764ba2 100%)';
+            btnComprar.style.color = 'white';
+            return;
+        }
+        
+        // Cambiar texto del botón
+        btnComprar.disabled = true;
+        btnComprar.textContent = '⏳ A carregar PayPal...';
+        
+        // Cargar PayPal SDK y renderizar
+        cargarPayPal();
+    });
+    
+    // ===== CARGAR Y CONFIGURAR PAYPAL =====
+    function cargarPayPal() {
+        // Verificar si ya existe el script
+        if (document.querySelector('script[src*="paypal.com/sdk"]')) {
+            renderizarPayPal();
+            return;
+        }
+        
+        // Cargar SDK de PayPal
+        const script = document.createElement('script');
+        // IMPORTANTE: Substituir este Client ID pelo seu próprio de https://developer.paypal.com/
+        // Este é um Client ID de SANDBOX (modo teste) - Não faz cobranças reais
+        // Para obtê-lo: https://developer.paypal.com/ > Apps & Credentials > Sandbox
+        const PAYPAL_CLIENT_ID = 'AZDxjDScFpQtjWTOUtWKbyN_bDt4OgqaF4eYXlewfBP4-8aqX3PiV8e1GWU6liB2CUXlkA59kJXE7M6R';
+        script.src = `https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT_ID}&currency=EUR&locale=pt_PT`;
+        script.onload = renderizarPayPal;
+        script.onerror = function() {
+            btnComprar.disabled = false;
+            btnComprar.textContent = '🛒 Comprar agora';
+            const errorDiv = document.getElementById('payment-error');
+            errorDiv.style.display = 'block';
+            errorDiv.innerHTML = '<strong>Erro ao carregar PayPal</strong><br>Por favor, verifique sua conexão e tente novamente.';
+        };
+        document.head.appendChild(script);
+    }
+    
+    function renderizarPayPal() {
+        const container = document.getElementById('paypal-button-container');
+        container.innerHTML = ''; // Limpiar contenedor
+        
+        paypal.Buttons({
+            style: {
+                layout: 'vertical',
+                color: 'gold',
+                shape: 'rect',
+                label: 'paypal',
+                height: 50
+            },
+            
+            createOrder: function(data, actions) {
+                const totais = calcularTotais();
+                const carrinho = JSON.parse(localStorage.getItem('carrinho') || '[]');
+                
+                const items = carrinho.map(item => ({
+                    name: item.titulo,
+                    unit_amount: {
+                        currency_code: 'EUR',
+                        value: parseFloat(item.preco).toFixed(2)
+                    },
+                    quantity: item.quantidade.toString()
+                }));
+                
+                return actions.order.create({
+                    purchase_units: [{
+                        description: 'Livros - Cantos de Papel',
+                        amount: {
+                            currency_code: 'EUR',
+                            value: totais.total,
+                            breakdown: {
+                                item_total: {
+                                    currency_code: 'EUR',
+                                    value: totais.subtotal
+                                },
+                                tax_total: {
+                                    currency_code: 'EUR',
+                                    value: totais.iva
+                                },
+                                discount: {
+                                    currency_code: 'EUR',
+                                    value: totais.desconto
+                                }
+                            }
+                        },
+                        items: items
+                    }],
+                    application_context: {
+                        shipping_preference: 'NO_SHIPPING',
+                        brand_name: 'Cantos de Papel',
+                        locale: 'pt-PT',
+                        user_action: 'PAY_NOW'
+                    }
+                });
+            },
+            
+            onApprove: function(data, actions) {
+                document.getElementById('payment-processing').style.display = 'block';
+                document.getElementById('paypal-button-container').style.display = 'none';
+                btnComprar.style.display = 'none';
+                
+                return actions.order.capture().then(function(orderData) {
+                    const form = document.getElementById('checkout-form');
+                    const formData = new FormData(form);
+                    
+                    formData.append('paypal_order_id', orderData.id);
+                    formData.append('paypal_payer_id', orderData.payer.payer_id);
+                    formData.append('paypal_payer_email', orderData.payer.email_address);
+                    formData.append('paypal_status', orderData.status);
+                    formData.append('paypal_amount', orderData.purchase_units[0].amount.value);
+                    formData.append('carrinho_data', localStorage.getItem('carrinho'));
+                    
+                    const cupomCodigo = document.getElementById('cupom_codigo_hidden').value;
+                    if (cupomCodigo) {
+                        formData.append('cupom_codigo', cupomCodigo);
+                    }
+                    
+                    fetch('/processar-pagamento-paypal/', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            localStorage.removeItem('carrinho');
+                            // Limpiar también los datos del formulario guardados
+                            camposFormulario.forEach(campoId => {
+                                localStorage.removeItem('checkout_' + campoId);
+                            });
+                            window.location.href = `/pedido-confirmado/${data.pedido_id}/`;
+                        } else {
+                            throw new Error(data.mensagem || 'Erro ao processar pagamento');
+                        }
+                    })
+                    .catch(error => {
+                        const errorDiv = document.getElementById('payment-error');
+                        errorDiv.style.display = 'block';
+                        errorDiv.textContent = 'Erro ao processar o pedido: ' + error.message;
+                        
+                        document.getElementById('payment-processing').style.display = 'none';
+                        document.getElementById('paypal-button-container').style.display = 'block';
+                        btnComprar.style.display = 'block';
+                        btnComprar.disabled = false;
+                        btnComprar.textContent = '🛒 Comprar agora';
+                    });
+                });
+            },
+            
+            onCancel: function() {
+                document.getElementById('payment-error').style.display = 'block';
+                document.getElementById('payment-error').textContent = 'Pagamento cancelado. Pode tentar novamente quando desejar.';
+                document.getElementById('payment-error').style.background = '#fff3cd';
+                document.getElementById('payment-error').style.color = '#856404';
+            },
+            
+            onError: function(err) {
+                console.error('Erro PayPal:', err);
+                document.getElementById('payment-error').style.display = 'block';
+                document.getElementById('payment-error').textContent = 'Erro ao processar pagamento. Tente novamente.';
+            }
+            
+        }).render('#paypal-button-container');
+        
+        // Marcar como cargado y mostrar
+        paypalCargado = true;
+        container.style.display = 'block';
+        btnComprar.disabled = false;
+        btnComprar.textContent = '⬇️ Pague com PayPal abaixo';
+        btnComprar.style.background = 'linear-gradient(180deg, #667eea 0%, #764ba2 100%)';
+        btnComprar.style.color = 'white';
+        
+        // Scroll hasta PayPal
+        container.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    
+    function calcularTotais() {
+        const subtotal = window.subtotal || 0;
+        const iva = subtotal * 0.23;
+        const desconto = window.descontoCupom || 0;
+        const total = subtotal + iva - desconto;
+        
+        return {
+            subtotal: subtotal.toFixed(2),
+            iva: iva.toFixed(2),
+            desconto: desconto.toFixed(2),
+            total: total.toFixed(2)
+        };
+    }
 });
 </script>
 {% endblock %}

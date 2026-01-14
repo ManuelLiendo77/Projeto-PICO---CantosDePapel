@@ -14,6 +14,7 @@ urlpatterns = [
     path('perfil/', views.perfil_usuario, name='perfil_usuario'),
     path('pedidos/<int:pedido_id>/', views.pedido_detalhe, name='pedido_detalhe'),
     path('checkout/', views.checkout, name='checkout'),
+    path('processar-pagamento-paypal/', views.processar_pagamento_paypal, name='processar_pagamento_paypal'),
     path('validar-cupom/', views.validar_cupom, name='validar_cupom'),
     path('pedido-confirmado/<int:pedido_id>/', views.pedido_confirmado, name='pedido_confirmado'),
     # Páginas legais

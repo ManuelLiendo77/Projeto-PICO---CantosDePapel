@@ -35,8 +35,20 @@ class PrecoInline(admin.TabularInline):
 class FilmeInline(admin.StackedInline):
     model = Filme
     extra = 0
-    fields = ('titulo', 'trailer_url')
+    fields = (
+        'titulo', 
+        'trailer_url',
+        ('url_netflix', 'url_prime_video'),
+    )
     can_delete = True
+    verbose_name = "Adaptação Cinematográfica"
+    verbose_name_plural = "Adaptações Cinematográficas"
+    
+    help_texts = {
+        'trailer_url': 'URL do YouTube ou Vimeo (será convertida automaticamente para formato embebido)',
+        'url_netflix': 'Link direto para o filme na Netflix (opcional)',
+        'url_prime_video': 'Link direto para o filme no Prime Video (opcional)',
+    }
 
 
 # ==================== ADMINISTRACIÓN DE LIVROS ====================

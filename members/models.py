@@ -54,25 +54,80 @@ class Livro(models.Model):
     return self.stock <= self.stock_minimo and self.stock > 0
   
   def rating_medio(self):
-    """Calcula a média das avaliações do livro"""
+    """Calcula a média das avaliações do livro."""
     reviews = self.reviews.all()
     if reviews.exists():
       return round(sum(r.rating for r in reviews) / reviews.count(), 1)
     return 0
   
   def total_reviews(self):
-    """Retorna o número total de avaliações"""
+    """Retorna o número total de avaliações."""
     return self.reviews.count()
   
   def obter_preco_minimo(self):
-    """Retorna o preço mínimo entre todas as lojas"""
+    """Retorna o preço mínimo entre todas as lojas."""
     preco_obj = self.preco_set.order_by('preco').first()
     return preco_obj.preco if preco_obj else None
   
   def obter_loja_preco_minimo(self):
-    """Retorna a loja com o preço mais baixo"""
+    """Retorna a loja com o preço mais baixo."""
     preco_obj = self.preco_set.select_related('loja').order_by('preco').first()
     return preco_obj.loja if preco_obj else None
+  
+  def obter_comparacao_precos(self):
+    """
+    Retorna todos os preços do livro ordenados do mais baixo ao mais alto.
+    Otimizado com select_related para evitar consultas N+1.
+    
+    Retorna:
+      QuerySet de Preco com loja carregada
+    """
+    return self.preco_set.select_related('loja').order_by('preco')
+  
+  def obter_preco_com_desconto(self):
+    """
+    Calcula o preço final considerando descontos ativos.
+    
+    Retorna:
+      dict com 'preco_final', 'preco_original', 'tem_desconto', 'percentagem'
+    """
+    preco_original = self.obter_preco_minimo()
+    if not preco_original:
+      return None
+    
+    if self.em_oferta and self.desconto_percentagem > 0:
+      desconto_decimal = float(self.desconto_percentagem) / 100
+      preco_final = float(preco_original) * (1 - desconto_decimal)
+      return {
+        'preco_final': round(preco_final, 2),
+        'preco_original': float(preco_original),
+        'tem_desconto': True,
+        'percentagem': float(self.desconto_percentagem)
+      }
+    
+    return {
+      'preco_final': float(preco_original),
+      'preco_original': float(preco_original),
+      'tem_desconto': False,
+      'percentagem': 0
+    }
+  
+  def obter_melhor_oferta(self):
+    """
+    Retorna a melhor oferta do livro (menor preço) com informação da loja.
+    Usado para destacar 'Melhor Preço' na interface.
+    
+    Retorna:
+      dict com 'preco', 'loja', 'url_produto' ou None
+    """
+    melhor_preco = self.preco_set.select_related('loja').order_by('preco').first()
+    if melhor_preco:
+      return {
+        'preco': melhor_preco.preco,
+        'loja': melhor_preco.loja,
+        'url_produto': melhor_preco.url_produto
+      }
+    return None
   
   class Meta:
     verbose_name = "Livro"
@@ -121,10 +176,80 @@ class Preco(models.Model):
 class Filme(models.Model):
   livro = models.OneToOneField(Livro, on_delete=models.CASCADE)
   titulo = models.CharField(max_length=255)
-  trailer_url = models.URLField(blank=True)
+  trailer_url = models.URLField(blank=True, help_text="URL do trailer (YouTube, Vimeo, etc.)")
+  url_netflix = models.URLField(blank=True, null=True, help_text="Link para ver na Netflix")
+  url_prime_video = models.URLField(blank=True, null=True, help_text="Link para ver no Prime Video")
   
   def __str__(self):
     return f"Filme: {self.titulo}"
+  
+  def obter_url_trailer_embebido(self):
+    """
+    Converte a URL do trailer para formato embebido (iframe).
+    Suporta YouTube e Vimeo.
+    
+    Retorna:
+      str: URL embebida ou None se inválida
+    """
+    if not self.trailer_url:
+      return None
+    
+    url = self.trailer_url.strip()
+    
+    # YouTube
+    if 'youtube.com/watch?v=' in url:
+      video_id = url.split('watch?v=')[1].split('&')[0]
+      return f"https://www.youtube.com/embed/{video_id}"
+    elif 'youtu.be/' in url:
+      video_id = url.split('youtu.be/')[1].split('?')[0]
+      return f"https://www.youtube.com/embed/{video_id}"
+    elif 'youtube.com/embed/' in url:
+      return url  # Já está no formato correto
+    
+    # Vimeo
+    elif 'vimeo.com/' in url:
+      video_id = url.split('vimeo.com/')[1].split('?')[0].split('/')[0]
+      return f"https://player.vimeo.com/video/{video_id}"
+    elif 'player.vimeo.com/video/' in url:
+      return url  # Já está no formato correto
+    
+    return None
+  
+  def tem_streaming_disponivel(self):
+    """
+    Verifica se o filme está disponível em alguma plataforma de streaming.
+    
+    Retorna:
+      bool: True se tiver pelo menos uma plataforma
+    """
+    return bool(self.url_netflix or self.url_prime_video)
+  
+  def obter_plataformas_disponiveis(self):
+    """
+    Retorna lista de plataformas de streaming disponíveis.
+    
+    Retorna:
+      list: Lista de dicts com 'nome', 'url', 'logo_class'
+    """
+    plataformas = []
+    
+    if self.url_netflix:
+      plataformas.append({
+        'nome': 'Netflix',
+        'url': self.url_netflix,
+        'logo_class': 'netflix',
+        'cor': '#E50914'
+      })
+    
+    if self.url_prime_video:
+      plataformas.append({
+        'nome': 'Prime Video',
+        'url': self.url_prime_video,
+        'logo_class': 'prime-video',
+        'cor': '#00A8E1'
+      })
+    
+    return plataformas
   
   class Meta:
     verbose_name = "Filme"
@@ -166,15 +291,15 @@ class Pedido(models.Model):
   numero_rastreio = models.CharField(max_length=100, blank=True)
   
   def calcular_subtotal(self):
-    """Calcula o subtotal dos itens (sem IVA e desconto)"""
+    """Calcula o subtotal dos itens (sem IVA e desconto)."""
     return sum(item.subtotal for item in self.itens.all())
   
   def calcular_iva(self, taxa_iva=0.23):
-    """Calcula o valor do IVA"""
+    """Calcula o valor do IVA."""
     return self.subtotal * taxa_iva
   
   def calcular_total(self):
-    """Calcula o total do pedido (subtotal + IVA - desconto)"""
+    """Calcula o total do pedido (subtotal + IVA - desconto)."""
     total = self.subtotal + self.iva - self.desconto_cupom
     return max(total, 0)  # Não pode ser negativo
   
@@ -281,7 +406,7 @@ class Cupom(models.Model):
     return f"{self.codigo} - {self.get_tipo_desconto_display()}"
   
   def esta_valido(self):
-    """Verifica se o cupom está válido"""
+    """Verifica se o cupom está válido."""
     agora = timezone.now()
     return (
       self.ativo and
@@ -290,7 +415,7 @@ class Cupom(models.Model):
     )
   
   def calcular_desconto(self, valor_pedido):
-    """Calcula o valor do desconto para um pedido"""
+    """Calcula o valor do desconto para um pedido."""
     if not self.esta_valido():
       return 0
     
@@ -306,7 +431,12 @@ class Cupom(models.Model):
     return min(desconto, valor_pedido)
   
   def pode_usar_utilizador(self, utilizador):
-    """Verifica se um utilizador pode usar este cupom"""
+    """
+    Verifica se um utilizador pode usar este cupom.
+    
+    Retorna:
+      tuple (bool, str): (pode_usar, mensagem)
+    """
     if not self.esta_valido():
       return False, "Cupom inválido ou expirado"
     
@@ -314,7 +444,7 @@ class Cupom(models.Model):
     usos_utilizador = UsoCupom.objects.filter(cupom=self, utilizador=utilizador).count()
     
     if usos_utilizador >= self.uso_por_utilizador:
-      return False, f"Você já usou este cupom {self.uso_por_utilizador} vez(es)"
+      return False, f"Já usou este cupom {self.uso_por_utilizador} vez(es)"
     
     return True, "Cupom válido"
   

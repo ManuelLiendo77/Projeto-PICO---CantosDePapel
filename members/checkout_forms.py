@@ -84,10 +84,12 @@ class CheckoutForm(forms.Form):
         ('mbway', _('MB Way')),
         ('multibanco', _('Multibanco')),
         ('cartao', _('Cartão de crédito/débito')),
+        ('paypal', _('PayPal')),
     ]
     
     metodo_pago = forms.ChoiceField(
         choices=METODOS_PAGO,
+        required=False,  # Opcional ya que PayPal se procesa aparte
         widget=forms.RadioSelect(attrs={
             'class': 'form-radio'
         }),
