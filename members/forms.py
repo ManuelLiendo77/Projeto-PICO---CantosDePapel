@@ -41,7 +41,9 @@ class RegistroForm(UserCreationForm):
         user.email = self.cleaned_data['email']
         if commit:
             user.save()
+            # VINCULACIÓN CRÍTICA: Asociar perfil con usuario
             perfil = Utilizador.objects.create(
+                user=user,
                 primeiro_nome=self.cleaned_data.get('primeiro_nome',''),
                 ultimo_nome=self.cleaned_data.get('ultimo_nome',''),
                 telefone=self.cleaned_data.get('telefone',''),
@@ -53,7 +55,6 @@ class RegistroForm(UserCreationForm):
                 codigo_postal=self.cleaned_data.get('codigo_postal',''),
                 localidade=self.cleaned_data.get('localidade','')
             )
-            # opcional: vincular perfil a usuario si usas OneToOne (no definido ahora)
         return user
 
     def clean_nif(self):

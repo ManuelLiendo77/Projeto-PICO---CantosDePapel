@@ -595,12 +595,27 @@ def checkout(request):
       return redirect('pedido_confirmado', pedido_id=pedido.id)
     
   else:
-    # Pré-preencher com dados do utilizador
+    # Pré-preencher com dados do utilizador e perfil
     initial_data = {
       'nome_completo': request.user.get_full_name() or request.user.username,
       'email': request.user.email,
       'pais': 'Portugal'
     }
+    
+    # Tentar carregar dados do perfil do utilizador
+    try:
+      perfil = request.user.perfil
+      initial_data.update({
+        'telefone': perfil.telefone,
+        'morada': perfil.morada,
+        'cidade': perfil.localidade,
+        'codigo_postal': perfil.codigo_postal,
+        'pais': perfil.pais or 'Portugal'
+      })
+    except (AttributeError, Utilizador.DoesNotExist):
+      # Utilizador sem perfil criado, usar valores por defeito
+      pass
+    
     form = CheckoutForm(initial=initial_data)
   
   context = {

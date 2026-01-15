@@ -1,11 +1,13 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.db.models import Avg
 import re
 
 
 # Modelo para utilizadores
 class Utilizador(models.Model):
+  user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='perfil')
   primeiro_nome = models.CharField(max_length=255)
   ultimo_nome = models.CharField(max_length=255)
   telefone = models.CharField(max_length=9, blank=True)
@@ -55,11 +57,9 @@ class Livro(models.Model):
     return self.stock <= self.stock_minimo and self.stock > 0
   
   def rating_medio(self):
-    """Calcula a média das avaliações do livro."""
-    reviews = self.reviews.all()
-    if reviews.exists():
-      return round(sum(r.rating for r in reviews) / reviews.count(), 1)
-    return 0
+    """Calcula a média das avaliações do livro usando agregação otimizada."""
+    media = self.reviews.aggregate(Avg('rating'))['rating__avg']
+    return round(media, 1) if media else 0
   
   def total_reviews(self):
     """Retorna o número total de avaliações."""
