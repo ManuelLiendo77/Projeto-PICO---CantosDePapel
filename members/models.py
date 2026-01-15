@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+import re
 
 
 # Modelo para utilizadores
@@ -186,32 +187,29 @@ class Filme(models.Model):
   def obter_url_trailer_embebido(self):
     """
     Converte a URL do trailer para formato embebido (iframe).
-    Suporta YouTube e Vimeo.
-    
-    Retorna:
-      str: URL embebida ou None se inválida
+    Usa Regex para suportar todos os formatos de YouTube (watch?v=, youtu.be, shorts, embed) e Vimeo.
     """
     if not self.trailer_url:
       return None
     
     url = self.trailer_url.strip()
     
-    # YouTube
-    if 'youtube.com/watch?v=' in url:
-      video_id = url.split('watch?v=')[1].split('&')[0]
-      return f"https://www.youtube.com/embed/{video_id}"
-    elif 'youtu.be/' in url:
-      video_id = url.split('youtu.be/')[1].split('?')[0]
-      return f"https://www.youtube.com/embed/{video_id}"
-    elif 'youtube.com/embed/' in url:
-      return url  # Já está no formato correto
+    # Regex universal para YouTube (captura o ID de 11 caracteres)
+    # Funciona com links de PC, telemóvel (youtu.be), Shorts, Embeds e youtube-nocookie
+    youtube_regex = r'(?:youtube(?:-nocookie)?\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/|youtube(?:-nocookie)?\.com\/shorts\/)([^"&?\/\s]{11})'
     
-    # Vimeo
-    elif 'vimeo.com/' in url:
-      video_id = url.split('vimeo.com/')[1].split('?')[0].split('/')[0]
-      return f"https://player.vimeo.com/video/{video_id}"
-    elif 'player.vimeo.com/video/' in url:
-      return url  # Já está no formato correto
+    match = re.search(youtube_regex, url)
+    if match:
+      video_id = match.group(1)
+      # Usa youtube.com normal con parámetros mínimos
+      return f"https://www.youtube.com/embed/{video_id}"
+    
+    # Suporte para Vimeo
+    if 'vimeo.com' in url:
+      vimeo_regex = r'(?:vimeo\.com\/|player\.vimeo\.com\/video\/)([0-9]+)'
+      match_vimeo = re.search(vimeo_regex, url)
+      if match_vimeo:
+        return f"https://player.vimeo.com/video/{match_vimeo.group(1)}"
     
     return None
   

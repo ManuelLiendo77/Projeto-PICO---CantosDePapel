@@ -1052,41 +1052,39 @@
             </div>
         </div>
 
-        <!-- Secção de Adaptação Cinematográfica -->
-        {% if filme %}
+        <!-- Secção de Trailer do Filme -->
+        {% if livro.tem_filme %}
             <div class="trailer-section">
                 <div class="trailer-header">
                     <div class="trailer-icon">🎬</div>
                     <div>
-                        <h2 class="trailer-titulo">Adaptação Cinematográfica</h2>
-                        <p class="trailer-subtitulo">Este livro foi adaptado para o cinema</p>
+                        <h2 class="trailer-titulo">Adaptado para o Cinema</h2>
+                        <p class="trailer-subtitulo">Veja o trailer oficial do filme baseado neste livro</p>
                     </div>
                 </div>
                 
                 <div class="trailer-content">
-                    <!-- Vídeo do Trailer -->
                     <div class="trailer-video-wrapper">
                         {% if trailer_url_embebido %}
                             <div class="trailer-video-container">
                                 <iframe 
                                     src="{{ trailer_url_embebido }}" 
-                                    title="Trailer de {{ filme.titulo }}"
+                                    title="Trailer de {% if filme.titulo %}{{ filme.titulo }}{% else %}{{ livro.titulo }}{% endif %}"
                                     frameborder="0"
                                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
                                     referrerpolicy="strict-origin-when-cross-origin"
-                                    allowfullscreen
-                                    loading="lazy">
+                                    allowfullscreen>
                                 </iframe>
                             </div>
                         {% else %}
-                            <div class="trailer-video-container" style="display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #f0f0f0 0%, #e8e8e8 100%); padding-bottom: 0; height: 400px;">
+                            <div class="trailer-video-container" style="display: flex; align-items: center; justify-content: center; background: #f0f0f0; padding-bottom: 0; height: 400px;">
                                 <div style="text-align: center; color: #999;">
                                     <div style="font-size: 60px; margin-bottom: 15px;">🎥</div>
-                                    <p style="font-size: 1.1rem; color: #666; margin: 10px 0;">Trailer não disponível</p>
-                                    <p style="font-size: 0.9rem; margin-top: 10px;">
-                                        <a href="https://www.youtube.com/results?search_query={{ livro.titulo|urlencode }}+{{ livro.autor|urlencode }}+trailer+oficial" 
+                                    <p>Trailer em breve</p>
+                                    <p style="font-size: 12px; margin-top: 10px;">
+                                        <a href="https://www.youtube.com/results?search_query={{ livro.titulo|urlencode }}+{{ livro.autor|urlencode }}+official+trailer" 
                                            target="_blank" 
-                                           style="color: #ff6b35; text-decoration: none; font-weight: 500;">
+                                           style="color: #ff6b35; text-decoration: none;">
                                             Procurar no YouTube →
                                         </a>
                                     </p>
@@ -1095,89 +1093,51 @@
                         {% endif %}
                     </div>
                     
-                    <!-- Informação da Adaptação -->
                     <div class="trailer-info">
-                        <!-- Detalhes do Filme -->
-                        <div class="trailer-info-item">
-                            <div class="trailer-info-titulo">
-                                🎭 Detalhes do Filme
-                            </div>
-                            <div class="trailer-info-texto">
-                                <strong>Título:</strong> {{ filme.titulo }}<br>
-                                <strong>Baseado em:</strong> {{ livro.titulo }}<br>
-                                <strong>Autor:</strong> {{ livro.autor }}
-                            </div>
-                        </div>
-                        
-                        <!-- Plataformas de Streaming -->
-                        {% if plataformas_streaming %}
-                        <div class="trailer-info-item">
-                            <div class="trailer-info-titulo">
-                                📺 Disponível em
-                            </div>
-                            <div class="trailer-info-texto" style="margin-bottom: 12px;">
-                                Assista ao filme nestas plataformas:
-                            </div>
-                            <div class="plataformas-streaming">
-                                {% for plataforma in plataformas_streaming %}
-                                    <a href="{{ plataforma.url }}" 
-                                       target="_blank" 
-                                       rel="noopener noreferrer"
-                                       class="btn-streaming btn-{{ plataforma.logo_class }}"
-                                       title="Ver na {{ plataforma.nome }}">
-                                        {% if plataforma.nome == 'Netflix' %}
-                                            <svg width="24" height="24" viewBox="0 0 256 256" style="margin-right: 8px;">
-                                                <g fill="#e50914">
-                                                    <path d="M140.803 258.904c-15.404 2.705-31.079 3.516-47.294 5.676l-49.458-144.856v151.073c-15.404 1.621-29.457 3.783-44.051 5.945v-276.742h41.08l56.212 157.021v-157.021h43.511v258.904zm85.131-157.558c16.757 0 42.431-.811 57.835-.811v43.24c-19.189 0-41.619 0-57.835.811v64.322c25.405-1.621 50.809-3.785 76.482-4.596v41.617l-119.724 9.461v-255.39h119.724v43.241h-76.482v58.105zm237.284-58.104h-44.862v198.908c-14.594 0-29.188 0-43.239.539v-199.447h-44.862v-43.242h132.965l-.002 43.242z"/>
-                                                </g>
-                                            </svg>
-                                            Ver na Netflix
-                                        {% elif plataforma.nome == 'Prime Video' %}
-                                            <svg width="24" height="24" viewBox="0 0 256 256" style="margin-right: 8px;">
-                                                <g fill="#00a8e1">
-                                                    <path d="M245.55 195.87c-9.94 7.86-24.44 12.07-36.88 12.07-24.97 0-47.32-9.27-59.86-24.78-2.48-3.08-2.19-7.64.65-10.37 2.84-2.74 7.39-2.45 10.17.47 9.57 10.05 25.62 16.32 42.39 16.32 9.53 0 20.61-2.72 28.15-7.34 1.56-.95 1.88-2.41 1.88-3.58 0-1.99-1.39-3.49-3.88-4.22-9.56-2.77-20.35-4.08-31.24-5.43-13.95-1.72-28.38-3.5-40.95-10.44-13.92-7.67-21.81-21.52-21.81-38.08 0-26.18 21.27-44.6 51.54-44.6 17.31 0 33.66 5.38 46 15.16 2.83 2.25 3.29 6.35 1.04 9.18-2.25 2.82-6.35 3.29-9.18 1.04-9.58-7.59-21.24-11.64-33.95-11.64-21.62 0-37.27 13.05-37.27 31.07 0 11.42 4.94 20.43 14.29 26.04 9.49 5.69 21.46 7.13 33.12 8.54 11.74 1.42 23.88 2.89 34.97 6.44 13.31 4.27 21.62 13.5 21.62 24.11 0 6.91-2.8 13.21-8.11 18.23"/>
-                                                </g>
-                                            </svg>
-                                            Ver no Prime Video
-                                        {% endif %}
-                                    </a>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        {% else %}
                         <div class="trailer-info-item">
                             <div class="trailer-info-titulo">
                                 📺 Onde Assistir
                             </div>
                             <div class="trailer-info-texto">
-                                Verifique a disponibilidade do filme nas plataformas de streaming:
+                                Verifique a disponibilidade do filme nas seguintes plataformas:
                             </div>
                             <div class="plataformas-list">
                                 <a href="https://www.netflix.com/search?q={{ livro.titulo|urlencode }}" 
                                    target="_blank" 
                                    class="plataforma-badge plataforma-link"
-                                   title="Procurar na Netflix">
+                                   title="Procurar em Netflix">
                                     Netflix
                                 </a>
                                 <a href="https://www.primevideo.com/search/ref=atv_nb_sr?phrase={{ livro.titulo|urlencode }}" 
                                    target="_blank" 
                                    class="plataforma-badge plataforma-link"
-                                   title="Procurar no Prime Video">
+                                   title="Procurar em Prime Video">
                                     Prime Video
                                 </a>
                                 <span class="plataforma-badge">Disney+</span>
                                 <span class="plataforma-badge">HBO Max</span>
+                                <span class="plataforma-badge">Apple TV+</span>
                             </div>
                         </div>
-                        {% endif %}
                         
-                        <!-- Dica de Leitura -->
+                        <div class="trailer-info-item">
+                            <div class="trailer-info-titulo">
+                                🎬 Sobre a Adaptação
+                            </div>
+                            <div class="trailer-info-texto">
+                                {% if filme and filme.titulo %}
+                                    <strong>Título do Filme:</strong> {{ filme.titulo }}<br>
+                                {% endif %}
+                                Este livro foi adaptado para o cinema, trazendo a história para as telas de forma emocionante e fiel ao original.
+                            </div>
+                        </div>
+                        
                         <div class="trailer-info-item">
                             <div class="trailer-info-titulo">
                                 💡 Dica de Leitura
                             </div>
                             <div class="trailer-info-texto">
-                                Leia o livro antes de ver o filme para uma experiência completa e aprofundada da história!
+                                Leia o livro antes de assistir ao filme para uma experiência completa e aprofundada da história!
                             </div>
                         </div>
                     </div>
