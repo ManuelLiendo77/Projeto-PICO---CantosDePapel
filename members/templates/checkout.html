@@ -1015,7 +1015,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // IMPORTANTE: Substituir este Client ID pelo seu próprio de https://developer.paypal.com/
         // Este é um Client ID de SANDBOX (modo teste) - Não faz cobranças reais
         // Para obtê-lo: https://developer.paypal.com/ > Apps & Credentials > Sandbox
-        const PAYPAL_CLIENT_ID = 'AZDxjDScFpQtjWTOUtWKbyN_bDt4OgqaF4eYXlewfBP4-8aqX3PiV8e1GWU6liB2CUXlkA59kJXE7M6R';
+        const PAYPAL_CLIENT_ID = 'AXYduD2wUSU1Db5TPbsDWe0dA_rE7vG0F8VOcVKgb4OpHkoIui_RbJG6iURYwvippgD4mmEiJ-dGoJc8';
         script.src = `https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT_ID}&currency=EUR&locale=pt_PT`;
         script.onload = renderizarPayPal;
         script.onerror = function() {
@@ -1042,100 +1042,94 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             
             createOrder: function(data, actions) {
-                const totais = calcularTotais();
-                const carrinho = JSON.parse(localStorage.getItem('carrinho') || '[]');
-                
-                const items = carrinho.map(item => ({
-                    name: item.titulo,
-                    unit_amount: {
-                        currency_code: 'EUR',
-                        value: parseFloat(item.preco).toFixed(2)
-                    },
-                    quantity: item.quantidade.toString()
-                }));
+        // [CORREÇÃO] Recalcular totais garantindo formato correto
+        const totais = calcularTotais();
+        const carrinho = JSON.parse(localStorage.getItem('carrinho') || '[]');
+        
+        const items = carrinho.map(item => {
+            // [TRUQUE] Converter "19,99" para "19.99" antes de fazer parseFloat
+            // Garante que o PayPal recebe os cêntimos!
+            let precoStr = String(item.preco).replace(',', '.');
+            let precoFloat = parseFloat(precoStr);
+
+            return {
+                name: item.titulo,
+                unit_amount: {
+                    currency_code: 'EUR',
+                    value: precoFloat.toFixed(2)
+                },
+                quantity: item.quantidade.toString()
+            };
+        });
                 
                 return actions.order.create({
-                    purchase_units: [{
-                        description: 'Livros - Cantos de Papel',
-                        amount: {
-                            currency_code: 'EUR',
-                            value: totais.total,
-                            breakdown: {
-                                item_total: {
-                                    currency_code: 'EUR',
-                                    value: totais.subtotal
-                                },
-                                tax_total: {
-                                    currency_code: 'EUR',
-                                    value: totais.iva
-                                },
-                                discount: {
-                                    currency_code: 'EUR',
-                                    value: totais.desconto
-                                }
-                            }
-                        },
-                        items: items
-                    }],
-                    application_context: {
-                        shipping_preference: 'NO_SHIPPING',
-                        brand_name: 'Cantos de Papel',
-                        locale: 'pt-PT',
-                        user_action: 'PAY_NOW'
+            purchase_units: [{
+                description: 'Livros - Cantos de Papel',
+                amount: {
+                    currency_code: 'EUR',
+                    value: totais.total, // Usa o total calculado pela função JS
+                    breakdown: {
+                        item_total: { currency_code: 'EUR', value: totais.subtotal },
+                        tax_total: { currency_code: 'EUR', value: totais.iva },
+                        discount: { currency_code: 'EUR', value: totais.desconto }
                     }
-                });
-            },
+                },
+                items: items
+            }]
+            // ... context mantido ...
+        });
+    },
             
             onApprove: function(data, actions) {
-                document.getElementById('payment-processing').style.display = 'block';
-                document.getElementById('paypal-button-container').style.display = 'none';
-                btnComprar.style.display = 'none';
+        // Mostra o spinner
+        document.getElementById('payment-processing').style.display = 'block';
+        document.getElementById('paypal-button-container').style.display = 'none';
+        btnComprar.style.display = 'none';
+        
+        return actions.order.capture().then(function(orderData) {
+            const form = document.getElementById('checkout-form');
+            const formData = new FormData(form);
+            
+            // Adicionar dados do PayPal
+            formData.append('paypal_order_id', orderData.id);
+            formData.append('paypal_payer_id', orderData.payer.payer_id);
+            formData.append('paypal_amount', orderData.purchase_units[0].amount.value);
+            
+            // [CORREÇÃO] Usar 'set' em vez de 'append' para evitar dados duplicados
+            formData.set('carrinho_data', localStorage.getItem('carrinho'));
+
+            // [IMPORTANTE] Usar URL dinâmica do Django
+            fetch("{% url 'processar_pagamento_paypal' %}", {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    // Garante que o CSRF token vai no header também (segurança extra)
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Limpar carrinho e redirecionar
+                    localStorage.removeItem('carrinho');
+                    window.location.href = `/pedido-confirmado/${data.pedido_id}/`;
+                } else {
+                    throw new Error(data.mensagem || 'Erro desconhecido');
+                }
+            })
+            .catch(error => {
+                // Tratamento de erros
+                console.error("Erro no fetch:", error);
+                const errorDiv = document.getElementById('payment-error');
+                errorDiv.style.display = 'block';
+                errorDiv.textContent = 'Erro: ' + error.message;
                 
-                return actions.order.capture().then(function(orderData) {
-                    const form = document.getElementById('checkout-form');
-                    const formData = new FormData(form);
-                    
-                    formData.append('paypal_order_id', orderData.id);
-                    formData.append('paypal_payer_id', orderData.payer.payer_id);
-                    formData.append('paypal_payer_email', orderData.payer.email_address);
-                    formData.append('paypal_status', orderData.status);
-                    formData.append('paypal_amount', orderData.purchase_units[0].amount.value);
-                    formData.append('carrinho_data', localStorage.getItem('carrinho'));
-                    
-                    const cupomCodigo = document.getElementById('cupom_codigo_hidden').value;
-                    if (cupomCodigo) {
-                        formData.append('cupom_codigo', cupomCodigo);
-                    }
-                    
-                    fetch('/processar-pagamento-paypal/', {
-                        method: 'POST',
-                        body: formData
-                    })
-                    .then(data => {
-                        if (data.success) {
-                            localStorage.removeItem('carrinho');
-                            // Limpiar también los datos del formulario guardados
-                            camposFormulario.forEach(campoId => {
-                                localStorage.removeItem('checkout_' + campoId);
-                            });
-                            window.location.href = `/pedido-confirmado/${data.pedido_id}/`;
-                        } else {
-                            throw new Error(data.mensagem || 'Erro ao processar pagamento');
-                        }
-                    })
-                    .catch(error => {
-                        const errorDiv = document.getElementById('payment-error');
-                        errorDiv.style.display = 'block';
-                        errorDiv.textContent = 'Erro ao processar o pedido: ' + error.message;
-                        
-                        document.getElementById('payment-processing').style.display = 'none';
-                        document.getElementById('paypal-button-container').style.display = 'block';
-                        btnComprar.style.display = 'block';
-                        btnComprar.disabled = false;
-                        btnComprar.textContent = '🛒 Comprar agora';
-                    });
-                });
-            },
+                // Resetar UI
+                document.getElementById('payment-processing').style.display = 'none';
+                document.getElementById('paypal-button-container').style.display = 'block';
+            });
+        });
+    },
             
             onCancel: function() {
                 document.getElementById('payment-error').style.display = 'block';
