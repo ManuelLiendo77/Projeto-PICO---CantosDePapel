@@ -153,6 +153,23 @@ deploy.sh
 ssl/
 
 # =============================================================================
+# Scripts de Debugging e Testes Temporários
+# =============================================================================
+*trailer*.py
+*debug*.py
+*teste*.html
+*test*.html
+*diagnostic*.py
+analizar_urls.py
+verificar_*.py
+corrigir_*.py
+atualizar_*.py
+limpiar_*.py
+adicionar_*.py
+exemplo_*.py
+reproduce_*.py
+
+# =============================================================================
 # IMPORTANTE
 # =============================================================================
 # Nunca commitar:
