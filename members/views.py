@@ -241,8 +241,14 @@ def lista_livros(request):
   categorias = sorted(list(set(categorias_raw)))  # Usar set() para remover duplicados garantidos
   
   # Obter todos os autores disponíveis (ordenados e sem duplicados)
+  # Dividir strings de múltiplos autores separados por vírgula
   autores_raw = Livro.objects.values_list('autor', flat=True).exclude(autor__isnull=True).exclude(autor='')
-  autores = sorted(list(set(autores_raw)))  # Usar set() para remover duplicados garantidos
+  autores_set = set()
+  for autor_string in autores_raw:
+    # Dividir por vírgula e limpar espaços
+    autores_individuais = [a.strip() for a in autor_string.split(',') if a.strip()]
+    autores_set.update(autores_individuais)
+  autores = sorted(list(autores_set))
   
   # Agrupar libros por categoría
   livros_por_categoria = {}

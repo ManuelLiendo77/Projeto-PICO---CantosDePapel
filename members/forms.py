@@ -20,21 +20,21 @@ class FilmeForm(forms.ModelForm):
 
 
 class RegistroForm(UserCreationForm):
-    email = forms.EmailField(required=True)
-    primeiro_nome = forms.CharField(required=True)
-    ultimo_nome = forms.CharField(required=True)
-    telefone = forms.CharField(required=False)
-    nif = forms.CharField(required=False)
-    pais = forms.CharField(required=False)
-    morada = forms.CharField(required=False)
-    porta = forms.CharField(required=False)
-    andar = forms.CharField(required=False)
-    codigo_postal = forms.CharField(required=False)
-    localidade = forms.CharField(required=False)
+    email = forms.EmailField(required=True, label='Email')
+    primeiro_nome = forms.CharField(required=True, label='Primeiro Nome')
+    ultimo_nome = forms.CharField(required=True, label='Último Nome')
+    telefone = forms.CharField(required=False, label='Telemóvel (opcional)')
+    nif = forms.CharField(required=False, label='NIF (opcional)')
+    pais = forms.CharField(required=False, label='País (opcional)')
+    morada = forms.CharField(required=False, label='Morada (opcional)')
+    porta = forms.CharField(required=False, label='Porta (opcional)')
+    andar = forms.CharField(required=False, label='Andar (opcional)')
+    codigo_postal = forms.CharField(required=False, label='Código Postal (opcional)')
+    localidade = forms.CharField(required=False, label='Localidade (opcional)')
 
     class Meta:
         model = User
-        fields = ('username', 'email', 'password1', 'password2')
+        fields = ('username', 'email', 'first_name', 'last_name')
 
     def save(self, commit=True):
         user = super().save(commit=False)

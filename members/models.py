@@ -186,25 +186,39 @@ class Filme(models.Model):
   
   def obter_url_trailer_embebido(self):
     """
-    Converte a URL do trailer para formato embebido (iframe).
-    Usa Regex para suportar todos os formatos de YouTube (watch?v=, youtu.be, shorts, embed) e Vimeo.
+    Converte a URL do trailer para formato embebido robusto (Privacy-Enhanced).
+    Lê qualquer formato (Shorts, Watch, youtu.be, links já convertidos) e
+    retorna sempre o formato youtube-nocookie para evitar bloqueios de browser.
     """
     if not self.trailer_url:
       return None
     
     url = self.trailer_url.strip()
     
-    # Regex universal para YouTube (captura o ID de 11 caracteres)
-    # Funciona com links de PC, telemóvel (youtu.be), Shorts, Embeds e youtube-nocookie
-    youtube_regex = r'(?:youtube(?:-nocookie)?\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/|youtube(?:-nocookie)?\.com\/shorts\/)([^"&?\/\s]{11})'
+    # Regex ULTRA ROBUSTA:
+    # 1. Procura pelo ID de 11 caracteres (letras, números, hífens, underscores)
+    # 2. Ignora o domínio (youtube, youtu.be, youtube-nocookie)
+    # 3. Funciona mesmo se o link já tiver parâmetros (?v=, &v=, /embed/, /shorts/)
     
-    match = re.search(youtube_regex, url)
+    # Procura pelo padrão do ID especificamente
+    regex_id = r'(?:v=|/v/|/embed/|youtu\.be/|/shorts/|\?v=)([a-zA-Z0-9_-]{11})'
+    
+    match = re.search(regex_id, url)
+    
     if match:
       video_id = match.group(1)
-      # Usa youtube.com normal con parámetros mínimos
-      return f"https://www.youtube.com/embed/{video_id}"
+      # RETORNO BLINDADO:
+      # Usa youtube-nocookie (evita ecrã preto em browsers rigorosos)
+      # rel=0: Evita vídeos recomendados de canais estranhos
+      return f"https://www.youtube-nocookie.com/embed/{video_id}?rel=0"
     
-    # Suporte para Vimeo
+    # Fallback: Se o regex acima falhar, tenta encontrar o ID se for apenas o ID cru ou formato atípico
+    # (Procura sequência de 11 chars válida no fim da string)
+    match_fallback = re.search(r'([a-zA-Z0-9_-]{11})$', url)
+    if match_fallback:
+      return f"https://www.youtube-nocookie.com/embed/{match_fallback.group(1)}?rel=0"
+    
+    # Suporte Vimeo mantido
     if 'vimeo.com' in url:
       vimeo_regex = r'(?:vimeo\.com\/|player\.vimeo\.com\/video\/)([0-9]+)'
       match_vimeo = re.search(vimeo_regex, url)
