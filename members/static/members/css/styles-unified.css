@@ -1541,6 +1541,27 @@ body {
     box-shadow: 0 8px 25px rgba(255,107,53,0.4);
 }
 
+.btn-ver-carrinho {
+    width: 100%;
+    padding: 15px;
+    background: white;
+    color: var(--primary-color);
+    border: 2px solid var(--primary-color);
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    margin-top: 8px;
+}
+
+.btn-ver-carrinho:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255,107,53,0.2);
+    background: var(--primary-color);
+    color: white;
+}
+
 /* ================================================
    8. FOOTER
    ================================================ */

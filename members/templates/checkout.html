@@ -806,9 +806,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Fazer requisição AJAX
+        // Calcular total con IVA para validar el cupón
+        const iva = window.subtotal * 0.23;
+        const totalConIva = window.subtotal + iva;
+        
         const formData = new FormData();
         formData.append('codigo', codigoCupom);
-        formData.append('valor_pedido', window.subtotal);
+        formData.append('valor_pedido', totalConIva);
         formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
         
         fetch('/validar-cupom/', {

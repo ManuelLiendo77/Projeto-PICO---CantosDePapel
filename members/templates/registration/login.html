@@ -26,7 +26,7 @@
                     autocomplete="username"
                 />
             </div>
-            <div class="field">
+            <div class="field" style="position: relative;">
                 <input 
                     type="password" 
                     name="password" 
@@ -35,6 +35,9 @@
                     required
                     autocomplete="current-password"
                 />
+                <button type="button" id="togglePassword" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 18px; padding: 5px;" title="Mostrar/Ocultar palavra-passe">
+                    👁️
+                </button>
             </div>
             <div class="inline-row">
                 <label class="checkbox">
@@ -88,6 +91,18 @@
                 container.style.opacity = '1';
                 container.style.transform = 'translateY(0)';
             }, 100);
+        }
+
+        // Toggle password visibility
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('id_password');
+        
+        if (togglePassword && passwordInput) {
+            togglePassword.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                this.textContent = type === 'password' ? '👁️' : '🙈';
+            });
         }
     })();
 </script>
