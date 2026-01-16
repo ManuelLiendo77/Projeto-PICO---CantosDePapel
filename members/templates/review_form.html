@@ -217,7 +217,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const stars = document.querySelectorAll('#rating-stars label');
   const inputs = document.querySelectorAll('#rating-stars input[type="radio"]');
   
-  // Función para actualizar las estrellas visuales
+  // Função para atualizar as estrelas visuais
   function updateStars(rating) {
     stars.forEach((star, index) => {
       const starRating = parseInt(star.getAttribute('data-rating'));
@@ -229,13 +229,13 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
-  // Establecer rating inicial si existe
+  // Estabelecer rating inicial se existir
   const checkedInput = document.querySelector('#rating-stars input[type="radio"]:checked');
   if (checkedInput) {
     updateStars(parseInt(checkedInput.value));
   }
   
-  // Manejar hover
+  // Gerir hover
   stars.forEach(star => {
     star.addEventListener('mouseenter', function() {
       const rating = parseInt(this.getAttribute('data-rating'));
@@ -254,7 +254,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
   
-  // Manejar click
+  // Gerir clique
   inputs.forEach(input => {
     input.addEventListener('change', function() {
       if (this.checked) {
