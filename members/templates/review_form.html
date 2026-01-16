@@ -52,8 +52,6 @@
   
   .rating-input {
     display: flex;
-    flex-direction: row-reverse;
-    justify-content: flex-end;
     gap: 5px;
     margin: 20px 0;
   }
@@ -69,9 +67,8 @@
     transition: color 0.2s;
   }
   
-  .rating-input input[type="radio"]:checked ~ label,
-  .rating-input label:hover,
-  .rating-input label:hover ~ label {
+  .rating-input label.selected,
+  .rating-input label.hover {
     color: #FFD700;
   }
   
@@ -180,11 +177,11 @@
     
     <div class="form-group">
       <label>{{ form.rating.label }}</label>
-      <div class="rating-input">
-        {% for choice in form.rating.field.choices %}
-          <input type="radio" name="rating" value="{{ choice.0 }}" id="rating_{{ choice.0 }}" 
-                 {% if form.rating.value == choice.0 %}checked{% endif %}>
-          <label for="rating_{{ choice.0 }}">★</label>
+      <div class="rating-input" id="rating-stars">
+        {% for i in "12345" %}
+          <input type="radio" name="rating" value="{{ i }}" id="rating_{{ i }}" 
+                 {% if form.rating.value|stringformat:"s" == i %}checked{% endif %}>
+          <label for="rating_{{ i }}" data-rating="{{ i }}">★</label>
         {% endfor %}
       </div>
       {% if form.rating.errors %}
@@ -214,4 +211,57 @@
     <a href="{% url 'livro_detalhe' livro.id %}" class="btn-cancel">Cancelar</a>
   </form>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const stars = document.querySelectorAll('#rating-stars label');
+  const inputs = document.querySelectorAll('#rating-stars input[type="radio"]');
+  
+  // Función para actualizar las estrellas visuales
+  function updateStars(rating) {
+    stars.forEach((star, index) => {
+      const starRating = parseInt(star.getAttribute('data-rating'));
+      if (starRating <= rating) {
+        star.classList.add('selected');
+      } else {
+        star.classList.remove('selected');
+      }
+    });
+  }
+  
+  // Establecer rating inicial si existe
+  const checkedInput = document.querySelector('#rating-stars input[type="radio"]:checked');
+  if (checkedInput) {
+    updateStars(parseInt(checkedInput.value));
+  }
+  
+  // Manejar hover
+  stars.forEach(star => {
+    star.addEventListener('mouseenter', function() {
+      const rating = parseInt(this.getAttribute('data-rating'));
+      stars.forEach((s, index) => {
+        const sRating = parseInt(s.getAttribute('data-rating'));
+        if (sRating <= rating) {
+          s.classList.add('hover');
+        } else {
+          s.classList.remove('hover');
+        }
+      });
+    });
+    
+    star.addEventListener('mouseleave', function() {
+      stars.forEach(s => s.classList.remove('hover'));
+    });
+  });
+  
+  // Manejar click
+  inputs.forEach(input => {
+    input.addEventListener('change', function() {
+      if (this.checked) {
+        updateStars(parseInt(this.value));
+      }
+    });
+  });
+});
+</script>
 {% endblock %}
